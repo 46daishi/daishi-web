@@ -21,8 +21,21 @@ const { title, description, image = FallbackImage } = Astro.props;
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="icon" href="/favicon.ico" />
+<script is:inline>
+	(() => {
+		const key = 'daishi-theme';
+		let theme;
+		try {
+			theme = localStorage.getItem(key);
+		} catch {}
+		if (theme !== 'light' && theme !== 'dark') {
+			theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+		}
+		document.documentElement.dataset.theme = theme;
+	})();
+</script>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
 	rel="alternate"
@@ -32,7 +45,8 @@ const { title, description, image = FallbackImage } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
-<Font cssVariable="--font-atkinson" preload />
+<Font cssVariable="--font-mono" preload />
+<Font cssVariable="--font-symbols" preload />
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
