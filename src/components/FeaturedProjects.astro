@@ -1,0 +1,222 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+type Props = {
+	projects: CollectionEntry<'projects'>[];
+};
+
+const { projects } = Astro.props;
+const isExternal = (href: string) => /^https?:\/\//.test(href);
+---
+
+{
+	projects.length > 0 && (
+		<section class="featured-projects" aria-labelledby="featured-projects-heading">
+			<div class="section-heading">
+				<h2 id="featured-projects-heading">featured projects</h2>
+				<a class="all-projects" href="/projects/">
+					All projects <span aria-hidden="true">→</span>
+				</a>
+			</div>
+
+			<ul class="project-grid">
+				{projects.map((project) => {
+					const { title, description, icon, links, color } = project.data;
+					const href = `/projects/${project.id}/`;
+
+					return (
+						<li>
+							<article class="project" style={`--project-color: ${color};`}>
+								<a class="project-main" href={href}>
+									<Image class="project-icon" src={icon} alt="" width={160} height={160} />
+									<h3>{title}</h3>
+								</a>
+								<p class="project-description">{description}</p>
+								{links.length > 0 && (
+									<ul class="project-actions" aria-label={`${title} links`}>
+										{links.map((link) => (
+											<li>
+												<a
+													href={link.href}
+													target={isExternal(link.href) ? '_blank' : undefined}
+													rel={isExternal(link.href) ? 'noreferrer' : undefined}
+												>
+													{link.label}
+												</a>
+											</li>
+										))}
+									</ul>
+								)}
+							</article>
+						</li>
+					);
+				})}
+			</ul>
+		</section>
+	)
+}
+
+<style>
+	.featured-projects {
+		margin-top: 3rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid hsl(var(--border));
+	}
+
+	.section-heading {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.section-heading h2 {
+		margin: 0;
+		font-size: 1.125rem;
+	}
+
+	.all-projects {
+		color: hsl(var(--muted-foreground));
+		font-size: 0.7rem;
+		letter-spacing: 0.06em;
+		text-decoration: none;
+		text-transform: uppercase;
+		transition: color 0.16s ease;
+	}
+
+	.all-projects:hover,
+	.all-projects:focus-visible {
+		color: hsl(var(--primary));
+	}
+
+	.project-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 2rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.project {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		height: 100%;
+		text-align: center;
+	}
+
+	.project-main {
+		display: inline-flex;
+		flex-direction: column;
+		align-items: center;
+		color: hsl(var(--foreground));
+		text-decoration: none;
+	}
+
+	.project-icon {
+		width: 80px;
+		height: 80px;
+		border: 0;
+	}
+
+	.project-main h3 {
+		margin: 0.75rem 0 0;
+		font-size: 1.05rem;
+		line-height: 1.35;
+		transition: color 0.16s ease;
+	}
+
+	.project-main:hover h3,
+	.project-main:focus-visible h3 {
+		color: var(--project-color);
+	}
+
+	.project-description {
+		margin: 0.45rem 0 0;
+		color: hsl(var(--muted-foreground));
+		font-size: 0.8125rem;
+		line-height: 1.65;
+	}
+
+	.project-actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.4rem;
+		min-height: 30px;
+		margin: auto 0 0;
+		padding: 0.75rem 0 0;
+		list-style: none;
+		opacity: 0;
+		pointer-events: none;
+		transform: translateY(4px);
+		transition:
+			opacity 0.16s ease,
+			transform 0.16s ease;
+	}
+
+	.project:hover .project-actions,
+	.project:focus-within .project-actions {
+		opacity: 1;
+		pointer-events: auto;
+		transform: none;
+	}
+
+	.project-actions a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 30px;
+		padding: 0.2rem 0.55rem;
+		border: 1px solid hsl(var(--border));
+		border-radius: 2px;
+		color: hsl(var(--muted-foreground));
+		font-size: 0.68rem;
+		letter-spacing: 0.06em;
+		text-decoration: none;
+		text-transform: uppercase;
+		transition:
+			border-color 0.16s ease,
+			color 0.16s ease;
+	}
+
+	.project-actions a:hover,
+	.project-actions a:focus-visible {
+		border-color: hsl(var(--primary));
+		color: hsl(var(--primary));
+	}
+
+	@media (hover: none), (max-width: 719px) {
+		.project-actions {
+			opacity: 1;
+			pointer-events: auto;
+			transform: none;
+		}
+	}
+
+	@media (max-width: 719px) {
+		.featured-projects {
+			margin-top: 2.5rem;
+		}
+
+		.project-grid {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.project-actions {
+			padding-top: 0.5rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.all-projects,
+		.project-main h3,
+		.project-actions,
+		.project-actions a {
+			transition: none;
+		}
+	}
+</style>

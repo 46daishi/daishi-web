@@ -1,0 +1,194 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import ProjectStatus from '../../components/ProjectStatus.astro';
+import {
+	PROJECT_STATUS_RANK,
+	PROJECT_TYPE_PLURALS,
+	PROJECT_TYPES,
+	SITE_TITLE,
+} from '../../consts';
+
+const projects = await getCollection('projects');
+
+const groups = PROJECT_TYPES.map((type) => ({
+	type,
+	label: PROJECT_TYPE_PLURALS[type],
+	projects: projects
+		.filter((project) => project.data.type === type)
+		.sort(
+			(a, b) =>
+				PROJECT_STATUS_RANK[a.data.status] - PROJECT_STATUS_RANK[b.data.status] ||
+				a.data.title.localeCompare(b.data.title),
+		),
+})).filter((group) => group.projects.length > 0);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`Projects | ${SITE_TITLE}`}
+			description="Visual novels, light novels, and software by 46dai."
+		/>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-intro">
+				<h1>Projects</h1>
+				<p>Visual novels, light novels, and software I'm working on.</p>
+			</header>
+
+			{
+				groups.map((group) => (
+					<section class="project-group" id={group.type} aria-labelledby={`${group.type}-heading`}>
+						<div class="group-heading">
+							<h2 id={`${group.type}-heading`}>{group.label}</h2>
+							<span class="group-count">{group.projects.length}</span>
+						</div>
+
+						<ul class="project-list">
+							{group.projects.map((project) => {
+								const { title, description, icon, status, color } = project.data;
+
+								return (
+									<li>
+										<a
+											class="project-row"
+											href={`/projects/${project.id}/`}
+											style={`--project-color: ${color};`}
+										>
+											<Image src={icon} alt="" width={80} height={80} />
+											<span class="project-copy">
+												<h3>{title}</h3>
+												<p>{description}</p>
+											</span>
+											<ProjectStatus status={status} />
+										</a>
+									</li>
+								);
+							})}
+						</ul>
+					</section>
+				))
+			}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.page-intro {
+		max-width: 62ch;
+		margin-bottom: 2.5rem;
+	}
+
+	.page-intro h1 {
+		margin-bottom: 0.35rem;
+	}
+
+	.page-intro p {
+		margin: 0;
+		color: hsl(var(--muted-foreground));
+	}
+
+	.project-group + .project-group {
+		margin-top: 2.5rem;
+	}
+
+	.group-heading {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		margin-bottom: 0.6rem;
+	}
+
+	.group-heading h2 {
+		margin: 0;
+		font-size: 0.75rem;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.group-count {
+		color: hsl(var(--muted-foreground));
+		font-size: 0.65rem;
+	}
+
+	.project-list {
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid hsl(var(--border));
+		list-style: none;
+	}
+
+	.project-list li {
+		border-bottom: 1px solid hsl(var(--border));
+	}
+
+	.project-row {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 1rem 0;
+		color: hsl(var(--foreground));
+		text-decoration: none;
+	}
+
+	.project-row :global(img) {
+		flex: 0 0 44px;
+		width: 44px;
+		height: 44px;
+		border: 0;
+	}
+
+	.project-copy {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.project-copy h3 {
+		margin: 0;
+		font-size: 1rem;
+		transition: color 0.16s ease;
+	}
+
+	.project-copy p {
+		margin: 0.15rem 0 0;
+		color: hsl(var(--muted-foreground));
+		font-size: 0.8rem;
+		line-height: 1.55;
+	}
+
+	.project-row:hover h3,
+	.project-row:focus-visible h3 {
+		color: var(--project-color);
+	}
+
+	@media (max-width: 719px) {
+		.project-row {
+			align-items: flex-start;
+			gap: 0.75rem;
+		}
+
+		.project-copy p {
+			font-size: 0.75rem;
+		}
+
+		.project-row :global(.project-status) {
+			margin-left: auto;
+			padding-top: 0.15rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.project-copy h3 {
+			transition: none;
+		}
+	}
+</style>

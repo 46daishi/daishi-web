@@ -1,0 +1,36 @@
+---
+import { PROJECT_STATUS_LABELS, type ProjectStatus } from '../consts';
+
+type Props = {
+	status: ProjectStatus;
+};
+
+const { status } = Astro.props;
+---
+
+<span class:list={['project-status', `status-${status}`]}>
+	{PROJECT_STATUS_LABELS[status]}
+</span>
+
+<style>
+	.project-status {
+		display: inline-flex;
+		align-items: center;
+		white-space: nowrap;
+	}
+
+	.project-status::before {
+		content: '';
+		display: inline-block;
+		width: 5px;
+		height: 5px;
+		margin-right: 0.35rem;
+		background: currentColor;
+		border-radius: 50%;
+		opacity: 0.65;
+	}
+
+	.status-active {
+		color: hsl(var(--primary));
+	}
+</style>

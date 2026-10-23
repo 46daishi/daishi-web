@@ -1,0 +1,130 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import ProjectStatus from '../../components/ProjectStatus.astro';
+import { PROJECT_TYPE_LABELS, SITE_TITLE } from '../../consts';
+import { hexToHslTriplet } from '../../lib/color';
+
+export async function getStaticPaths() {
+	const projects = await getCollection('projects');
+
+	return projects.map((project) => ({
+		params: { slug: project.id },
+		props: { project },
+	}));
+}
+
+type Props = {
+	project: CollectionEntry<'projects'>;
+};
+
+const { project } = Astro.props;
+const { title, description, icon, type, status, color } = project.data;
+const projectColor = hexToHslTriplet(color);
+---
+
+<!doctype html>
+<html
+	lang="en"
+	style={`--primary: ${projectColor}; --brand: ${projectColor}; --ring: ${projectColor};`}
+>
+	<head>
+		<BaseHead title={`${title} | ${SITE_TITLE}`} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<article class="project-page">
+				<a class="back-link" href="/projects/">← Projects</a>
+
+				<header class="project-header">
+					<Image src={icon} alt="" width={128} height={128} />
+					<div>
+						<p class="project-meta">
+							<span>{PROJECT_TYPE_LABELS[type]}</span>
+							<span aria-hidden="true">·</span>
+							<ProjectStatus status={status} />
+						</p>
+						<h1>{title}</h1>
+					</div>
+				</header>
+
+				<p class="project-description">{description}</p>
+
+				<hr />
+
+				<p class="placeholder">Full project page coming soon.</p>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.back-link {
+		display: inline-block;
+		margin-bottom: 2rem;
+		color: hsl(var(--muted-foreground));
+		font-size: 0.7rem;
+		letter-spacing: 0.06em;
+		text-decoration: none;
+		text-transform: uppercase;
+		transition: color 0.16s ease;
+	}
+
+	.back-link:hover,
+	.back-link:focus-visible {
+		color: hsl(var(--primary));
+	}
+
+	.project-header {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+	}
+
+	.project-header :global(img) {
+		flex: 0 0 64px;
+		width: 64px;
+		height: 64px;
+		border: 0;
+	}
+
+	.project-meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.35rem;
+		margin: 0 0 0.35rem;
+		color: hsl(var(--muted-foreground));
+		font-size: 0.65rem;
+		letter-spacing: 0.06em;
+		line-height: 1.4;
+		text-transform: uppercase;
+	}
+
+	.project-header h1 {
+		margin: 0;
+	}
+
+	.project-description {
+		max-width: 62ch;
+		margin: 1.5rem 0 0;
+		color: hsl(var(--muted-foreground));
+	}
+
+	.placeholder {
+		color: hsl(var(--muted-foreground));
+		font-size: 0.8rem;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.back-link {
+			transition: none;
+		}
+	}
+</style>
