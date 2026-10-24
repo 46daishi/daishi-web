@@ -68,7 +68,7 @@ export default defineConfig({
             options: {
                 variants: [
                     {
-                        src: ['./src/assets/fonts/symbols-nerd-font-sun-moon.woff2'],
+                        src: ['./src/assets/fonts/symbols-nerd-font-ui.woff2'],
                         weight: 400,
                         style: 'normal',
                         display: 'block',

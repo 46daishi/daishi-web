@@ -2,13 +2,23 @@
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import pfp from '../assets/pfp.jpg';
+import blogFallback from '../assets/blog-placeholder-1.jpg';
 import BaseHead from '../components/BaseHead.astro';
 import FeaturedProjects from '../components/FeaturedProjects.astro';
 import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import PillLink from '../components/PillLink.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
-const featuredProjects = (await getCollection('projects'))
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const latestPosts = posts.slice(0, 4);
+const featuredPosts = posts.slice(0, 3);
+const projects = await getCollection('projects');
+
+const featuredProjects = projects
 	.filter((project) => project.data.featured && project.data.status === 'active')
 	.sort(
 		(a, b) =>
@@ -70,6 +80,86 @@ const featuredProjects = (await getCollection('projects'))
 			</section>
 
 			<FeaturedProjects projects={featuredProjects} />
+
+			<section class="home-blog" aria-label="Blog posts">
+				<section class="latest-posts" aria-labelledby="latest-posts-heading">
+					<div class="blog-heading">
+						<h2 id="latest-posts-heading">latest blog posts</h2>
+						<PillLink href="/blog/" icon="\uee75">
+							All posts
+						</PillLink>
+					</div>
+					<ul>
+						{latestPosts.map((post) => (
+							<li>
+								<article class="latest-post">
+									<a class="latest-post-title" href={`/blog/${post.id}/`}>
+										{post.data.title}
+									</a>
+									<time datetime={post.data.pubDate.toISOString()}>
+										<FormattedDate date={post.data.pubDate} />
+									</time>
+									{(post.data.tags.length > 0 || post.data.project) && (
+										<div class="post-taxonomy">
+											{post.data.tags.map((tag) => <span class="post-tag">{tag}</span>)}
+											{post.data.project &&
+												(() => {
+													const project = projects.find(
+														(project) => project.id === post.data.project,
+													);
+													return (
+														<a
+															class="post-project"
+															href={`/projects/${post.data.project}/`}
+															style={project ? `--project-color: ${project.data.color};` : undefined}
+														>
+															{project?.data.title ?? post.data.project}
+														</a>
+													);
+												})()}
+										</div>
+									)}
+								</article>
+							</li>
+						))}
+					</ul>
+				</section>
+
+				<section class="featured-posts" aria-labelledby="featured-posts-heading">
+					<h2 id="featured-posts-heading">featured posts</h2>
+					<div class="featured-post-list">
+						{featuredPosts.map((post) => {
+							const project = projects.find((project) => project.id === post.data.project);
+
+							return (
+								<a class="featured-post" href={`/blog/${post.id}/`}>
+									<Image
+										src={post.data.heroImage ?? blogFallback}
+										alt=""
+										width={720}
+										height={360}
+									/>
+									<span class="featured-post-meta">
+										<time datetime={post.data.pubDate.toISOString()}>
+											<FormattedDate date={post.data.pubDate} />
+										</time>
+										{post.data.tags.map((tag) => <span class="featured-post-tag">{tag}</span>)}
+										{project && (
+											<span
+												class="featured-post-tag"
+												style={`--project-color: ${project.data.color};`}
+											>
+												{project.data.title}
+											</span>
+										)}
+									</span>
+									<span class="featured-post-title">{post.data.title}</span>
+								</a>
+							);
+						})}
+					</div>
+				</section>
+			</section>
 		</main>
 		<Footer />
 	</body>
@@ -152,6 +242,204 @@ const featuredProjects = (await getCollection('projects'))
 		height: 16px;
 	}
 
+	.home-blog {
+		display: grid;
+		grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+		align-items: stretch;
+		gap: 2.5rem;
+		margin-top: 3rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid hsl(var(--border));
+	}
+
+	.blog-heading {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.home-blog h2 {
+		margin: 0 0 1rem;
+		font-size: 1.125rem;
+	}
+
+	.latest-posts ul {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.latest-posts {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.latest-posts li {
+		display: flex;
+		flex: 1;
+		border-top: 1px solid hsl(var(--border));
+	}
+
+	.latest-post {
+		display: grid;
+		flex: 1;
+		align-content: center;
+		gap: 0.1rem;
+		padding: 0.7rem 0;
+	}
+
+	.latest-post-title {
+		color: hsl(var(--foreground));
+		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.latest-post time {
+		color: hsl(var(--muted-foreground));
+		font-size: 0.7rem;
+	}
+
+	.latest-post-title:hover,
+	.latest-post-title:focus-visible {
+		color: hsl(var(--primary));
+	}
+
+	.post-taxonomy {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.35rem;
+		margin-top: 0.25rem;
+	}
+
+	.post-tag,
+	.post-project {
+		padding: 0.12rem 0.55rem;
+		border: 1px solid transparent;
+		border-radius: 999px;
+		background: hsl(var(--muted));
+		color: hsl(var(--muted-foreground));
+		font-size: 0.65rem;
+		font-weight: 600;
+		line-height: 1.6;
+		text-decoration: none;
+		text-transform: lowercase;
+	}
+
+	.post-project {
+		border-color: color-mix(in srgb, var(--project-color, hsl(var(--primary))) 22%, transparent);
+		background: color-mix(in srgb, var(--project-color, hsl(var(--primary))) 12%, transparent);
+		color: var(--project-color, hsl(var(--primary)));
+	}
+
+	.post-project:hover,
+	.post-project:focus-visible {
+		border-color: color-mix(in srgb, var(--project-color, hsl(var(--primary))) 40%, transparent);
+		background: color-mix(in srgb, var(--project-color, hsl(var(--primary))) 20%, transparent);
+	}
+
+	.post-taxonomy a {
+		position: relative;
+		z-index: 1;
+	}
+
+	.featured-post-list {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.featured-post {
+		position: relative;
+		display: flex;
+		align-items: flex-end;
+		min-height: 8rem;
+		overflow: hidden;
+		color: white;
+		background: hsl(var(--muted));
+		text-decoration: none;
+	}
+
+	.featured-post::after {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(rgb(0 0 0 / 0.7), transparent 55%, rgb(0 0 0 / 0.75));
+		content: '';
+	}
+
+	.featured-post img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		border: 0;
+		object-fit: cover;
+		transition: transform 0.2s ease;
+	}
+
+	.featured-post-meta {
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 1;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.65rem 0.75rem;
+		font-size: 0.65rem;
+		line-height: 1.5;
+		opacity: 0;
+		transform: translateY(-4px);
+		transition:
+			opacity 0.16s ease,
+			transform 0.16s ease;
+	}
+
+	.featured-post-tag {
+		padding: 0.1rem 0.5rem;
+		border: 1px solid hsl(0 0% 100% / 0.24);
+		border-radius: 999px;
+		background: hsl(0 0% 0% / 0.35);
+		color: white;
+		backdrop-filter: blur(8px);
+	}
+
+	.featured-post-tag:last-child {
+		border-color: color-mix(in srgb, var(--project-color, white) 45%, transparent);
+		background: color-mix(in srgb, var(--project-color, white) 38%, hsl(0 0% 0% / 0.55));
+	}
+
+	.featured-post-title {
+		position: relative;
+		z-index: 1;
+		padding: 0.75rem;
+		font-size: 0.9rem;
+		font-weight: 600;
+		line-height: 1.35;
+	}
+
+	.featured-post:hover .featured-post-meta,
+	.featured-post:focus-visible .featured-post-meta {
+		opacity: 1;
+		transform: none;
+	}
+
+	.featured-post:hover img,
+	.featured-post:focus-visible img {
+		transform: scale(1.04);
+	}
+
+	@media (hover: none) {
+		.featured-post-meta {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
 	@media (max-width: 719px) {
 		.intro {
 			gap: 1.25rem;
@@ -168,6 +456,19 @@ const featuredProjects = (await getCollection('projects'))
 
 		.intro-copy p {
 			font-size: 0.9375rem;
+		}
+
+		.home-blog {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+			margin-top: 2.5rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.featured-post img,
+		.featured-post-meta {
+			transition: none;
 		}
 	}
 </style>

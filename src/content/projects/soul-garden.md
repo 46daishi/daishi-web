@@ -9,4 +9,5 @@ featured: false
 links:
   - label: Details
     href: /projects/soul-garden/
+    icon: "\udb82\udda8"
 ---

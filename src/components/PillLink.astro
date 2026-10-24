@@ -1,0 +1,58 @@
+---
+interface Props {
+	href: string;
+	icon?: string;
+	className?: string;
+}
+
+const { href, icon, className } = Astro.props;
+---
+
+<a class:list={['pill-link', className]} href={href}>
+	{icon && <span class="pill-link-icon" aria-hidden="true">{icon}</span>}
+	<slot />
+</a>
+
+<style>
+	.pill-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		min-height: 1.5rem;
+		padding: 0.2rem 0.65rem;
+		border: 1px solid hsl(var(--site-accent) / 0.18);
+		border-radius: 8px;
+		background: hsl(var(--site-accent) / 0.1);
+		color: hsl(var(--site-accent));
+		font-size: 0.65rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-decoration: none;
+		text-transform: uppercase;
+		transition:
+			background-color 0.16s ease,
+			border-color 0.16s ease,
+			color 0.16s ease,
+			transform 0.16s ease;
+	}
+
+	.pill-link:hover,
+	.pill-link:focus-visible {
+		border-color: hsl(var(--site-accent));
+		background: hsl(var(--site-accent));
+		color: hsl(var(--site-accent-foreground));
+		transform: translateY(-1px);
+	}
+
+	.pill-link-icon {
+		font-family: var(--font-symbols);
+		font-size: 0.9em;
+		line-height: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pill-link {
+			transition: none;
+		}
+	}
+</style>

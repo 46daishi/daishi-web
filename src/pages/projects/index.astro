@@ -8,23 +8,35 @@ import ProjectStatus from '../../components/ProjectStatus.astro';
 import {
 	PROJECT_STATUS_RANK,
 	PROJECT_TYPE_PLURALS,
-	PROJECT_TYPES,
 	SITE_TITLE,
 } from '../../consts';
 
 const projects = await getCollection('projects');
 
-const groups = PROJECT_TYPES.map((type) => ({
-	type,
-	label: PROJECT_TYPE_PLURALS[type],
-	projects: projects
-		.filter((project) => project.data.type === type)
-		.sort(
+const groups = [
+	{
+		type: 'writing',
+		label: 'Writing',
+		projects: projects.filter(
+			(project) =>
+				project.data.type === 'visual-novel' || project.data.type === 'light-novel',
+		),
+	},
+	{
+		type: 'software',
+		label: PROJECT_TYPE_PLURALS.software,
+		projects: projects.filter((project) => project.data.type === 'software'),
+	},
+]
+	.map((group) => ({
+		...group,
+		projects: group.projects.sort(
 			(a, b) =>
 				PROJECT_STATUS_RANK[a.data.status] - PROJECT_STATUS_RANK[b.data.status] ||
 				a.data.title.localeCompare(b.data.title),
 		),
-})).filter((group) => group.projects.length > 0);
+	}))
+	.filter((group) => group.projects.length > 0);
 ---
 
 <!doctype html>
@@ -116,8 +128,16 @@ const groups = PROJECT_TYPES.map((type) => ({
 	}
 
 	.group-count {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.4rem;
+		padding: 0.05rem 0.4rem;
+		border-radius: 999px;
+		background: hsl(var(--muted));
 		color: hsl(var(--muted-foreground));
 		font-size: 0.65rem;
+		line-height: 1.5;
 	}
 
 	.project-list {

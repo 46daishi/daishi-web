@@ -6,6 +6,8 @@
 	--muted-foreground: 217 14% 42%;
 	--primary: 207.5 100% 50%;
 	--primary-foreground: 0 0% 100%;
+	--site-accent: 207.5 100% 50%;
+	--site-accent-foreground: 0 0% 100%;
 	--brand: 207.5 100% 50%;
 	--accent-deep: 188 72% 24%;
 	--border: 210 25% 85%;
@@ -32,6 +34,8 @@
 	--muted-foreground: 218 14% 60%;
 	--primary: 207.5 100% 50%;
 	--primary-foreground: 220 29% 6%;
+	--site-accent: 207.5 100% 50%;
+	--site-accent-foreground: 220 29% 6%;
 	--brand: 207.5 100% 50%;
 	--accent-deep: 188 60% 50%;
 	--border: 218 32% 23%;
@@ -298,6 +302,7 @@ hr {
 	white-space: nowrap;
 	border: 0;
 }
+
 
 @media (max-width: 720px) {
 	body {

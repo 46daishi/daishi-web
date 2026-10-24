@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
+import PillLink from './PillLink.astro';
 
 type Props = {
 	projects: CollectionEntry<'projects'>[];
@@ -15,9 +16,9 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 		<section class="featured-projects" aria-labelledby="featured-projects-heading">
 			<div class="section-heading">
 				<h2 id="featured-projects-heading">featured projects</h2>
-				<a class="all-projects" href="/projects/">
-					All projects <span aria-hidden="true">→</span>
-				</a>
+				<PillLink href="/projects/" icon="\uf005">
+					All projects
+				</PillLink>
 			</div>
 
 			<ul class="project-grid">
@@ -42,6 +43,11 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 													target={isExternal(link.href) ? '_blank' : undefined}
 													rel={isExternal(link.href) ? 'noreferrer' : undefined}
 												>
+													{link.icon && (
+														<span class="project-action-icon" aria-hidden="true">
+															{link.icon}
+														</span>
+													)}
 													{link.label}
 												</a>
 											</li>
@@ -75,20 +81,6 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 	.section-heading h2 {
 		margin: 0;
 		font-size: 1.125rem;
-	}
-
-	.all-projects {
-		color: hsl(var(--muted-foreground));
-		font-size: 0.7rem;
-		letter-spacing: 0.06em;
-		text-decoration: none;
-		text-transform: uppercase;
-		transition: color 0.16s ease;
-	}
-
-	.all-projects:hover,
-	.all-projects:focus-visible {
-		color: hsl(var(--primary));
 	}
 
 	.project-grid {
@@ -168,24 +160,39 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 	.project-actions a {
 		display: inline-flex;
 		align-items: center;
+		gap: 0.35rem;
 		min-height: 30px;
-		padding: 0.2rem 0.55rem;
-		border: 1px solid hsl(var(--border));
-		border-radius: 2px;
-		color: hsl(var(--muted-foreground));
+		padding: 0.25rem 0.7rem;
+		border: 1px solid hsl(var(--primary) / 0.18);
+		border-radius: 999px;
+		background: hsl(var(--primary) / 0.08);
+		color: hsl(var(--primary));
 		font-size: 0.68rem;
+		font-weight: 600;
 		letter-spacing: 0.06em;
 		text-decoration: none;
 		text-transform: uppercase;
 		transition:
+			background-color 0.16s ease,
 			border-color 0.16s ease,
-			color 0.16s ease;
+			color 0.16s ease,
+			transform 0.16s ease;
 	}
 
 	.project-actions a:hover,
 	.project-actions a:focus-visible {
 		border-color: hsl(var(--primary));
-		color: hsl(var(--primary));
+		background: hsl(var(--primary));
+		color: hsl(var(--primary-foreground));
+		transform: translateY(-1px);
+	}
+
+	.project-action-icon {
+		display: inline-flex;
+		gap: 0.35rem;
+		font-family: 'Symbols Nerd Font', var(--font-symbols);
+		font-size: 0.9rem;
+		line-height: 1;
 	}
 
 	@media (hover: none), (max-width: 719px) {
@@ -212,10 +219,8 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.all-projects,
 		.project-main h3,
-		.project-actions,
-		.project-actions a {
+		.project-actions {
 			transition: none;
 		}
 	}

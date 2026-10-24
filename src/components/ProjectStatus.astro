@@ -16,21 +16,30 @@ const { status } = Astro.props;
 	.project-status {
 		display: inline-flex;
 		align-items: center;
+		padding: 0.2rem 0.6rem;
+		border: 1px solid hsl(var(--border));
+		border-radius: 999px;
+		background: hsl(var(--muted));
+		color: hsl(var(--muted-foreground));
+		font-size: 0.68rem;
+		font-weight: 600;
+		line-height: 1.4;
 		white-space: nowrap;
 	}
 
 	.project-status::before {
 		content: '';
 		display: inline-block;
-		width: 5px;
-		height: 5px;
-		margin-right: 0.35rem;
+		width: 6px;
+		height: 6px;
+		margin-right: 0.4rem;
 		background: currentColor;
 		border-radius: 50%;
-		opacity: 0.65;
 	}
 
 	.status-active {
+		border-color: hsl(var(--primary) / 0.2);
+		background: hsl(var(--primary) / 0.1);
 		color: hsl(var(--primary));
 	}
 </style>

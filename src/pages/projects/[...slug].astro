@@ -5,9 +5,10 @@ import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
+import PillLink from '../../components/PillLink.astro';
 import ProjectStatus from '../../components/ProjectStatus.astro';
 import { PROJECT_TYPE_LABELS, SITE_TITLE } from '../../consts';
-import { hexToHslTriplet } from '../../lib/color';
+import { hexToHslTriplet } from '../lib/color';
 
 export async function getStaticPaths() {
 	const projects = await getCollection('projects');
@@ -30,16 +31,23 @@ const projectColor = hexToHslTriplet(color);
 <!doctype html>
 <html
 	lang="en"
-	style={`--primary: ${projectColor}; --brand: ${projectColor}; --ring: ${projectColor};`}
+	style={`--primary: ${projectColor}; --site-accent: ${projectColor}; --site-accent-foreground: var(--primary-foreground); --brand: ${projectColor}; --ring: ${projectColor};`}
 >
 	<head>
 		<BaseHead title={`${title} | ${SITE_TITLE}`} description={description} />
 	</head>
 	<body>
-		<Header />
+		<Header projectName={title} />
 		<main>
 			<article class="project-page">
-				<a class="back-link" href="/projects/">← Projects</a>
+				<nav class="project-navigation" aria-label="Project navigation">
+					<PillLink href="/projects/" icon="\uf060">
+						Projects
+					</PillLink>
+					<PillLink href="/" icon="\uf015">
+						Home
+					</PillLink>
+				</nav>
 
 				<header class="project-header">
 					<Image src={icon} alt="" width={128} height={128} />
@@ -65,20 +73,11 @@ const projectColor = hexToHslTriplet(color);
 </html>
 
 <style>
-	.back-link {
-		display: inline-block;
+	.project-navigation {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.55rem;
 		margin-bottom: 2rem;
-		color: hsl(var(--muted-foreground));
-		font-size: 0.7rem;
-		letter-spacing: 0.06em;
-		text-decoration: none;
-		text-transform: uppercase;
-		transition: color 0.16s ease;
-	}
-
-	.back-link:hover,
-	.back-link:focus-visible {
-		color: hsl(var(--primary));
 	}
 
 	.project-header {
@@ -122,9 +121,4 @@ const projectColor = hexToHslTriplet(color);
 		font-size: 0.8rem;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.back-link {
-			transition: none;
-		}
-	}
 </style>

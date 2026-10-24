@@ -10,6 +10,8 @@ featuredOrder: 2
 links:
   - label: Details
     href: /projects/tomoyo/
+    icon: "\udb82\udda8"
   - label: Download
     href: https://github.com/46daishi/tomoyo
+    icon: "\ue709"
 ---

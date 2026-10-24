@@ -4,6 +4,12 @@ import hana from '../assets/46hana.png';
 import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
 
+interface Props {
+	projectName?: string;
+}
+
+const { projectName } = Astro.props;
+
 const [siteName, ...siteDomainParts] = SITE_TITLE.split('.');
 const siteDomain = siteDomainParts.join('.');
 
@@ -24,6 +30,12 @@ const navItems = [
 				{siteName}{siteDomain && <span class="brand-domain">.{siteDomain}</span>}
 			</span>
 		</a>
+
+		{projectName && (
+			<span class="brand-name project-name">
+				<span class="project-prefix" aria-hidden="true">/ </span>{projectName}
+			</span>
+		)}
 
 		<nav class="site-nav" aria-label="Primary navigation">
 			<ul>
@@ -146,6 +158,15 @@ const navItems = [
 		letter-spacing: -0.05em;
 	}
 
+	.project-name {
+		color: hsl(var(--primary));
+		text-transform: lowercase;
+	}
+
+	.project-prefix {
+		color: hsl(var(--foreground));
+	}
+
 	.brand-domain {
 		color: hsl(var(--primary));
 	}
@@ -198,7 +219,7 @@ const navItems = [
 		min-height: 40px;
 		color: hsl(var(--muted-foreground));
 		font-size: 0.75rem;
-		font-weight: 500;
+		font-weight: 800;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		text-decoration: none;
