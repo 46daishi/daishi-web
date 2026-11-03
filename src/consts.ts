@@ -10,13 +10,13 @@ export type ProjectType = (typeof PROJECT_TYPES)[number];
 export const PROJECT_TYPE_LABELS: Record<ProjectType, string> = {
 	'visual-novel': 'Visual Novel',
 	'light-novel': 'Light Novel',
-	software: 'Software',
+	software: 'software',
 };
 
 export const PROJECT_TYPE_PLURALS: Record<ProjectType, string> = {
 	'visual-novel': 'Visual Novels',
 	'light-novel': 'Light Novels',
-	software: 'Software',
+	software: 'software',
 };
 
 export const PROJECT_STATUSES = ['active', 'planned', 'paused', 'completed', 'archived'] as const;

@@ -1,0 +1,145 @@
+---
+import { Image } from 'astro:assets';
+import hana from '../assets/46hana.png';
+
+interface Props {
+	compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+
+<div class:list={['hana-divider', { compact }]} aria-hidden="true">
+	<span class="hana-line"></span>
+	<span class="hana-mark">
+		<Image class="hana-icon" src={hana} alt="" width={72} height={72} />
+	</span>
+	<span class="hana-line"></span>
+</div>
+
+<style>
+	.hana-divider {
+		display: flex;
+		align-items: center;
+		gap: 0.9rem;
+		width: 100%;
+		margin: 2.75rem 0;
+	}
+
+	.hana-line {
+		position: relative;
+		flex: 1;
+		height: 1px;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			hsl(var(--border)) 45%,
+			hsl(var(--primary) / 0.35)
+		);
+		transform-origin: right center;
+		animation: hana-line-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	}
+
+	.hana-line:last-child {
+		background: linear-gradient(
+			90deg,
+			hsl(var(--primary) / 0.35),
+			hsl(var(--border)) 55%,
+			transparent
+		);
+		transform-origin: left center;
+	}
+
+	.hana-line::after {
+		position: absolute;
+		top: 50%;
+		width: 5px;
+		height: 5px;
+		background: hsl(var(--primary) / 0.45);
+		transform: translateY(-50%) rotate(45deg);
+		content: '';
+	}
+
+	.hana-line:first-child::after {
+		right: 0;
+	}
+
+	.hana-line:last-child::after {
+		left: 0;
+	}
+
+	.hana-mark {
+		position: relative;
+		display: grid;
+		flex: 0 0 auto;
+		place-items: center;
+		width: 36px;
+		height: 36px;
+	}
+
+	.hana-mark::after {
+		position: absolute;
+		inset: 4px;
+		border: 1px solid hsl(var(--primary) / 0.18);
+		border-radius: 50%;
+		content: '';
+	}
+
+	.hana-icon {
+		position: relative;
+		z-index: 1;
+		width: 24px;
+		height: 24px;
+		margin: 0;
+		border: 0;
+		animation: hana-bloom 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	}
+
+	.hana-divider.compact {
+		margin: 1.75rem 0;
+	}
+
+	@keyframes hana-line-in {
+		from {
+			transform: scaleX(0);
+		}
+		to {
+			transform: scaleX(1);
+		}
+	}
+
+	@keyframes hana-bloom {
+		from {
+			opacity: 0;
+			transform: scale(0.7);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	@media (max-width: 719px) {
+		.hana-divider {
+			gap: 0.6rem;
+			margin: 2.25rem 0;
+		}
+
+		.hana-mark {
+			width: 36px;
+			height: 36px;
+		}
+
+		.hana-icon {
+			width: 26px;
+			height: 26px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hana-line,
+		.hana-icon {
+			animation: none;
+		}
+	}
+</style>

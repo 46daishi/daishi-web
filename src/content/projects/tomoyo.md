@@ -5,6 +5,7 @@ icon: '../../assets/icons/tomoyo.png'
 color: '#466db5'
 type: software
 status: active
+version: v1.4.2
 featured: true
 featuredOrder: 2
 links:

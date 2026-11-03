@@ -16,10 +16,6 @@ const { status } = Astro.props;
 	.project-status {
 		display: inline-flex;
 		align-items: center;
-		padding: 0.2rem 0.6rem;
-		border: 1px solid hsl(var(--border));
-		border-radius: 999px;
-		background: hsl(var(--muted));
 		color: hsl(var(--muted-foreground));
 		font-size: 0.68rem;
 		font-weight: 600;
@@ -38,8 +34,6 @@ const { status } = Astro.props;
 	}
 
 	.status-active {
-		border-color: hsl(var(--primary) / 0.2);
-		background: hsl(var(--primary) / 0.1);
 		color: hsl(var(--primary));
 	}
 </style>

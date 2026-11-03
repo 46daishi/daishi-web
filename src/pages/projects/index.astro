@@ -1,214 +1,412 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
-import ProjectStatus from '../../components/ProjectStatus.astro';
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import BaseHead from "../../components/BaseHead.astro";
+import Footer from "../../components/Footer.astro";
+import HanaDivider from "../../components/HanaDivider.astro";
+import Header from "../../components/Header.astro";
+import ProjectStatus from "../../components/ProjectStatus.astro";
 import {
-	PROJECT_STATUS_RANK,
-	PROJECT_TYPE_PLURALS,
-	SITE_TITLE,
-} from '../../consts';
+    PROJECT_STATUS_RANK,
+    PROJECT_TYPE_PLURALS,
+    SITE_TITLE,
+} from "../../consts";
 
-const projects = await getCollection('projects');
+const projects = await getCollection("projects");
+const isExternal = (href: string) => /^https?:\/\//.test(href);
 
 const groups = [
-	{
-		type: 'writing',
-		label: 'Writing',
-		projects: projects.filter(
-			(project) =>
-				project.data.type === 'visual-novel' || project.data.type === 'light-novel',
-		),
-	},
-	{
-		type: 'software',
-		label: PROJECT_TYPE_PLURALS.software,
-		projects: projects.filter((project) => project.data.type === 'software'),
-	},
+    {
+        type: "writing",
+        label: "writing",
+        icon: "\uee75",
+        projects: projects.filter(
+            (project) =>
+                project.data.type === "visual-novel" ||
+                project.data.type === "light-novel",
+        ),
+    },
+    {
+        type: "software",
+        label: PROJECT_TYPE_PLURALS.software,
+        icon: "\uf121",
+        projects: projects.filter(
+            (project) => project.data.type === "software",
+        ),
+    },
 ]
-	.map((group) => ({
-		...group,
-		projects: group.projects.sort(
-			(a, b) =>
-				PROJECT_STATUS_RANK[a.data.status] - PROJECT_STATUS_RANK[b.data.status] ||
-				a.data.title.localeCompare(b.data.title),
-		),
-	}))
-	.filter((group) => group.projects.length > 0);
+    .map((group) => ({
+        ...group,
+        projects: group.projects.sort(
+            (a, b) =>
+                PROJECT_STATUS_RANK[a.data.status] -
+                    PROJECT_STATUS_RANK[b.data.status] ||
+                a.data.title.localeCompare(b.data.title),
+        ),
+    }))
+    .filter((group) => group.projects.length > 0);
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead
-			title={`Projects | ${SITE_TITLE}`}
-			description="Visual novels, light novels, and software by 46dai."
-		/>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<header class="page-intro">
-				<h1>Projects</h1>
-				<p>Visual novels, light novels, and software I'm working on.</p>
-			</header>
+    <head>
+        <BaseHead
+            title={`projects | ${SITE_TITLE}`}
+            description="Visual novels, light novels, and software by 46dai."
+        />
+    </head>
+    <body>
+        <Header />
+        <main>
+            <header class="page-intro">
+                <h1>projects</h1>
+                <p>Visual novels, light novels, and software I'm working on.</p>
+            </header>
 
-			{
-				groups.map((group) => (
-					<section class="project-group" id={group.type} aria-labelledby={`${group.type}-heading`}>
-						<div class="group-heading">
-							<h2 id={`${group.type}-heading`}>{group.label}</h2>
-							<span class="group-count">{group.projects.length}</span>
-						</div>
+            {groups.map((group, index) => (
+                <>
+                    {index > 0 && <HanaDivider />}
+                    <section
+                        class="project-group"
+                        id={group.type}
+                        aria-labelledby={`${group.type}-heading`}
+                    >
+                    <div class="group-heading">
+                        <h2 id={`${group.type}-heading`}>
+                            <span class="group-icon" aria-hidden="true">
+                                {group.icon}
+                            </span>
+                            {group.label}
+                        </h2>
+                        <span class="group-count">{group.projects.length}</span>
+                    </div>
 
-						<ul class="project-list">
-							{group.projects.map((project) => {
-								const { title, description, icon, status, color } = project.data;
+                    <ul
+                        class:list={[
+                            "project-grid",
+                            { "project-grid-start": group.projects.length < 3 },
+                        ]}
+                    >
+                        {group.projects.map((project) => {
+                            const {
+                                title,
+                                description,
+                                icon,
+                                status,
+                                version,
+                                color,
+                                links,
+                            } = project.data;
+                            const href = `/projects/${project.id}/`;
 
-								return (
-									<li>
-										<a
-											class="project-row"
-											href={`/projects/${project.id}/`}
-											style={`--project-color: ${color};`}
-										>
-											<Image src={icon} alt="" width={80} height={80} />
-											<span class="project-copy">
-												<h3>{title}</h3>
-												<p>{description}</p>
-											</span>
-											<ProjectStatus status={status} />
-										</a>
-									</li>
-								);
-							})}
-						</ul>
-					</section>
-				))
-			}
-		</main>
-		<Footer />
-	</body>
+                            return (
+                                <li>
+                                    <article
+                                        class="project"
+                                        style={`--project-color: ${color};`}
+                                    >
+                                        <div class="project-header">
+                                            <a
+                                                class="project-icon-link"
+                                                href={href}
+                                                tabindex="-1"
+                                                aria-hidden="true"
+                                            >
+                                                <Image
+                                                    class="project-icon"
+                                                    src={icon}
+                                                    alt=""
+                                                    width={160}
+                                                    height={160}
+                                                />
+                                            </a>
+                                            <div class="project-heading">
+                                                <a
+                                                    class="project-title"
+                                                    href={href}
+                                                >
+                                                    <h3>{title}</h3>
+                                                </a>
+                                                <div class="project-meta">
+                                                    <ProjectStatus
+                                                        status={status}
+                                                    />
+                                                    {version && (
+                                                        <span class="project-version">
+                                                            {version}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="project-description">
+                                            {description}
+                                        </p>
+                                        {links.length > 0 && (
+                                            <ul
+                                                class="project-actions"
+                                                aria-label={`${title} links`}
+                                            >
+                                                {links.map((link) => (
+                                                    <li>
+                                                        <a
+                                                            href={link.href}
+                                                            target={
+                                                                isExternal(
+                                                                    link.href,
+                                                                )
+                                                                    ? "_blank"
+                                                                    : undefined
+                                                            }
+                                                            rel={
+                                                                isExternal(
+                                                                    link.href,
+                                                                )
+                                                                    ? "noreferrer"
+                                                                    : undefined
+                                                            }
+                                                        >
+                                                            {link.icon && (
+                                                                <span
+                                                                    class="project-action-icon"
+                                                                    aria-hidden="true"
+                                                                >
+                                                                    {link.icon}
+                                                                </span>
+                                                            )}
+                                                            {link.label}
+                                                        </a>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </article>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                    </section>
+                </>
+            ))}
+        </main>
+        <Footer />
+    </body>
 </html>
 
 <style>
-	.page-intro {
-		max-width: 62ch;
-		margin-bottom: 2.5rem;
-	}
+    .page-intro {
+        max-width: 62ch;
+        margin-bottom: 2.5rem;
+    }
 
-	.page-intro h1 {
-		margin-bottom: 0.35rem;
-	}
+    .page-intro h1 {
+        margin-bottom: 0.35rem;
+    }
 
-	.page-intro p {
-		margin: 0;
-		color: hsl(var(--muted-foreground));
-	}
+    .page-intro p {
+        margin: 0;
+        color: hsl(var(--muted-foreground));
+    }
 
-	.project-group + .project-group {
-		margin-top: 2.5rem;
-	}
+    .group-heading {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
 
-	.group-heading {
-		display: flex;
-		align-items: baseline;
-		gap: 0.5rem;
-		margin-bottom: 0.6rem;
-	}
+    .group-heading h2 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
 
-	.group-heading h2 {
-		margin: 0;
-		font-size: 0.75rem;
-		font-weight: 500;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-	}
+    .group-icon {
+        color: hsl(var(--primary));
+        font-family: "Symbols Nerd Font", var(--font-symbols);
+        font-size: 1rem;
+        line-height: 1;
+    }
 
-	.group-count {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-width: 1.4rem;
-		padding: 0.05rem 0.4rem;
-		border-radius: 999px;
-		background: hsl(var(--muted));
-		color: hsl(var(--muted-foreground));
-		font-size: 0.65rem;
-		line-height: 1.5;
-	}
+    .group-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.4rem;
+        padding: 0.05rem 0.4rem;
+        border-radius: 999px;
+        background: hsl(var(--muted));
+        color: hsl(var(--muted-foreground));
+        font-size: 0.65rem;
+        line-height: 1.5;
+    }
 
-	.project-list {
-		margin: 0;
-		padding: 0;
-		border-top: 1px solid hsl(var(--border));
-		list-style: none;
-	}
+    .project-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
 
-	.project-list li {
-		border-bottom: 1px solid hsl(var(--border));
-	}
+    .project-grid-start {
+        justify-content: flex-start;
+    }
 
-	.project-row {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		padding: 1rem 0;
-		color: hsl(var(--foreground));
-		text-decoration: none;
-	}
+    .project-grid > li {
+        flex: 1 1 220px;
+        max-width: 288px;
+    }
 
-	.project-row :global(img) {
-		flex: 0 0 44px;
-		width: 44px;
-		height: 44px;
-		border: 0;
-	}
+    .project {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        text-align: left;
+    }
 
-	.project-copy {
-		flex: 1;
-		min-width: 0;
-	}
+    .project-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+    }
 
-	.project-copy h3 {
-		margin: 0;
-		font-size: 1rem;
-		transition: color 0.16s ease;
-	}
+    .project-icon-link {
+        display: flex;
+        flex: 0 0 auto;
+    }
 
-	.project-copy p {
-		margin: 0.15rem 0 0;
-		color: hsl(var(--muted-foreground));
-		font-size: 0.8rem;
-		line-height: 1.55;
-	}
+    .project-icon {
+        width: 64px;
+        height: 64px;
+        border: 0;
+    }
 
-	.project-row:hover h3,
-	.project-row:focus-visible h3 {
-		color: var(--project-color);
-	}
+    .project-heading {
+        min-width: 0;
+    }
 
-	@media (max-width: 719px) {
-		.project-row {
-			align-items: flex-start;
-			gap: 0.75rem;
-		}
+    .project-title {
+        color: hsl(var(--foreground));
+        text-decoration: none;
+    }
 
-		.project-copy p {
-			font-size: 0.75rem;
-		}
+    .project-heading h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        line-height: 1.35;
+        transition: color 0.16s ease;
+    }
 
-		.project-row :global(.project-status) {
-			margin-left: auto;
-			padding-top: 0.15rem;
-		}
-	}
+    .project:hover .project-title h3,
+    .project:focus-within .project-title h3,
+    .project-title:focus-visible h3 {
+        color: var(--project-color);
+    }
 
-	@media (prefers-reduced-motion: reduce) {
-		.project-copy h3 {
-			transition: none;
-		}
-	}
+    .project-description {
+        margin: 0.75rem 0 0;
+        color: hsl(var(--muted-foreground));
+        font-size: 0.8125rem;
+        line-height: 1.65;
+        text-align: left;
+    }
+
+    .project-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.5rem;
+        margin: 0.35rem 0 0;
+    }
+
+    .project-version {
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1.4;
+        white-space: nowrap;
+    }
+
+    .project-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 0.4rem;
+        min-height: 30px;
+        margin: auto 0 0;
+        padding: 0.75rem 0 0;
+        list-style: none;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(4px);
+        transition:
+            opacity 0.16s ease,
+            transform 0.16s ease;
+    }
+
+    .project:hover .project-actions,
+    .project:focus-within .project-actions {
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+    }
+
+    .project-actions a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        min-height: 30px;
+        padding: 0.25rem 0.7rem;
+        border: 1px solid color-mix(in srgb, var(--project-color) 22%, transparent);
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--project-color) 12%, transparent);
+        color: var(--project-color);
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition:
+            background-color 0.16s ease,
+            border-color 0.16s ease,
+            color 0.16s ease,
+            transform 0.16s ease;
+    }
+
+    .project-actions a:hover,
+    .project-actions a:focus-visible {
+        border-color: color-mix(in srgb, var(--project-color) 45%, transparent);
+        background: color-mix(in srgb, var(--project-color) 20%, transparent);
+        transform: translateY(-1px);
+    }
+
+    .project-action-icon {
+        display: inline-flex;
+        gap: 0.35rem;
+        font-family: "Symbols Nerd Font", var(--font-symbols);
+        font-size: 0.9rem;
+        line-height: 1;
+    }
+
+    @media (hover: none), (max-width: 719px) {
+        .project-actions {
+            opacity: 1;
+            pointer-events: auto;
+            transform: none;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .project-title h3,
+        .project-actions {
+            transition: none;
+        }
+    }
 </style>

@@ -7,6 +7,7 @@ import BaseHead from '../components/BaseHead.astro';
 import FeaturedProjects from '../components/FeaturedProjects.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import HanaDivider from '../components/HanaDivider.astro';
 import Header from '../components/Header.astro';
 import PillLink from '../components/PillLink.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
@@ -79,7 +80,11 @@ const featuredProjects = projects
 				</div>
 			</section>
 
+			<HanaDivider />
+
 			<FeaturedProjects projects={featuredProjects} />
+
+			<HanaDivider />
 
 			<section class="home-blog" aria-label="Blog posts">
 				<section class="latest-posts" aria-labelledby="latest-posts-heading">
@@ -210,8 +215,9 @@ const featuredProjects = projects
 	.intro-copy p {
 		max-width: 52ch;
 		margin: 0;
-		font-size: 1rem;
-		line-height: 1.75;
+		font-family: var(--font-serif);
+		font-size: 1.0625rem;
+		line-height: 1.7;
 	}
 
 	.social-links {
@@ -247,9 +253,6 @@ const featuredProjects = projects
 		grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
 		align-items: stretch;
 		gap: 2.5rem;
-		margin-top: 3rem;
-		padding-top: 1.25rem;
-		border-top: 1px solid hsl(var(--border));
 	}
 
 	.blog-heading {
@@ -294,7 +297,10 @@ const featuredProjects = projects
 
 	.latest-post-title {
 		color: hsl(var(--foreground));
+		font-family: var(--font-serif);
+		font-size: 1.05rem;
 		font-weight: 700;
+		letter-spacing: -0.01em;
 		text-decoration: none;
 	}
 
@@ -417,8 +423,10 @@ const featuredProjects = projects
 		position: relative;
 		z-index: 1;
 		padding: 0.75rem;
-		font-size: 0.9rem;
+		font-family: var(--font-serif);
+		font-size: 1rem;
 		font-weight: 600;
+		letter-spacing: -0.01em;
 		line-height: 1.35;
 	}
 
@@ -455,13 +463,12 @@ const featuredProjects = projects
 		}
 
 		.intro-copy p {
-			font-size: 0.9375rem;
+			font-size: 1rem;
 		}
 
 		.home-blog {
 			grid-template-columns: 1fr;
 			gap: 2rem;
-			margin-top: 2.5rem;
 		}
 	}
 

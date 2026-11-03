@@ -30,6 +30,7 @@ const projects = defineCollection({
 			color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Use a six-digit hex colour'),
 			type: z.enum(PROJECT_TYPES),
 			status: z.enum(PROJECT_STATUSES).default('active'),
+			version: z.string().optional(),
 			featured: z.boolean().default(false),
 			featuredOrder: z.number().default(0),
 			links: z

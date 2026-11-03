@@ -5,6 +5,7 @@ icon: '../../assets/icons/soul-garden.png'
 color: '#008aff'
 type: light-novel
 status: active
+version: Volume 1
 featured: false
 links:
   - label: Details

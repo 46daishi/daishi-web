@@ -5,6 +5,7 @@ icon: '../../assets/icons/spring-poems.png'
 color: '#ff78c4'
 type: visual-novel
 status: active
+version: Chapter 4
 featured: true
 featuredOrder: 1
 links:
