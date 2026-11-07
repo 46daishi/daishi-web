@@ -34,6 +34,10 @@ const { status } = Astro.props;
 	}
 
 	.status-active {
-		color: hsl(var(--primary));
+		color: hsl(142 72% 29%);
+	}
+
+	:global(:root[data-theme='dark']) .status-active {
+		color: hsl(142 70% 55%);
 	}
 </style>

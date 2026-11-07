@@ -90,7 +90,9 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 
 	.section-heading h2 {
 		margin: 0;
-		font-size: 1.125rem;
+		font-size: 1.3rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
 	}
 
 	.project-grid {
@@ -103,10 +105,32 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 	}
 
 	.project {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		height: 100%;
+		overflow: hidden;
+		padding: 0.85rem;
+		border: 1px solid color-mix(in srgb, var(--project-color) 22%, hsl(var(--border)));
+		border-top: 2px solid var(--project-color);
+		border-radius: 0.75rem;
+		background: color-mix(in srgb, var(--project-color) 4%, hsl(var(--card)));
+		box-shadow: 0 2px 6px rgb(var(--black) / 0.04);
 		text-align: left;
+		transition:
+			border-color 0.16s ease,
+			background-color 0.16s ease,
+			box-shadow 0.16s ease,
+			transform 0.16s ease;
+	}
+
+	.project:hover,
+	.project:focus-within {
+		transform: translateY(-2px);
+		border-color: color-mix(in srgb, var(--project-color) 48%, hsl(var(--border)));
+		border-top-color: var(--project-color);
+		background: color-mix(in srgb, var(--project-color) 7%, hsl(var(--card)));
+		box-shadow: 0 8px 18px rgb(var(--black) / 0.1);
 	}
 
 	.project-header {
@@ -119,12 +143,22 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 	.project-icon-link {
 		display: flex;
 		flex: 0 0 auto;
+		overflow: hidden;
+		border: 1px solid color-mix(in srgb, var(--project-color) 25%, transparent);
+		border-radius: 0.5rem;
+		background: color-mix(in srgb, var(--project-color) 8%, hsl(var(--card)));
 	}
 
 	.project-icon {
 		width: 64px;
 		height: 64px;
 		border: 0;
+		transition: transform 0.16s ease;
+	}
+
+	.project:hover .project-icon,
+	.project:focus-within .project-icon {
+		transform: scale(1.04);
 	}
 
 	.project-heading {
@@ -151,9 +185,9 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 
 	.project-description {
 		margin: 0.75rem 0 0;
-		color: hsl(var(--muted-foreground));
-		font-size: 0.8125rem;
-		line-height: 1.65;
+		color: hsl(var(--foreground) / 0.82);
+		font-size: 0.875rem;
+		line-height: 1.55;
 		text-align: left;
 	}
 
@@ -254,8 +288,10 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.project,
 		.project-title h3,
-		.project-actions {
+		.project-actions,
+		.project-icon {
 			transition: none;
 		}
 	}

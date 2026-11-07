@@ -17,7 +17,15 @@ const blog = defineCollection({
 			heroImage: z.optional(image()),
 			tags: z.array(z.string()).default([]),
 			project: z.string().optional(),
+			featured: z.boolean().default(false),
 		}),
+});
+
+const log = defineCollection({
+	loader: glob({ base: './src/content/log', pattern: '**/*.{md,mdx}' }),
+	schema: z.object({
+		date: z.coerce.date(),
+	}),
 });
 
 const projects = defineCollection({
@@ -46,4 +54,4 @@ const projects = defineCollection({
 		}),
 });
 
-export const collections = { blog, projects };
+export const collections = { blog, log, projects };
