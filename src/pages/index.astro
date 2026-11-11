@@ -3,13 +3,14 @@ import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import pfp from '../assets/pfp.jpg';
 import blogFallback from '../assets/blog-placeholder-1.jpg';
+import cursorSprite from '../assets/icons/cursor0.bmp?url';
 import BaseHead from '../components/BaseHead.astro';
 import FeaturedProjects from '../components/FeaturedProjects.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import HanaDivider from '../components/HanaDivider.astro';
 import Header from '../components/Header.astro';
-import PillLink from '../components/PillLink.astro';
+import SectionLink from '../components/SectionLink.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const posts = (await getCollection('blog')).sort(
@@ -29,6 +30,12 @@ const renderedLogEntries = await Promise.all(
 		return { entry, Content };
 	}),
 );
+const formatLogDate = new Intl.DateTimeFormat('ja-JP', {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	timeZone: 'UTC',
+});
 
 const featuredProjects = projects
 	.filter((project) => project.data.featured && project.data.status === 'active')
@@ -48,17 +55,13 @@ const featuredProjects = projects
 		<Header />
 		<main class="home-page">
 			<section class="intro" aria-labelledby="intro-heading">
-				<figure class="portrait">
-					<Image src={pfp} alt="daishi's profile picture" width={360} height={360} loading="eager" />
-					<figcaption>
-						pfp source <a href="https://x.com/nngw_000" target="_blank" rel="noreferrer">@nngw_000</a>
-					</figcaption>
-				</figure>
-				<div class="intro-copy">
-					<h1 id="intro-heading">46<span>dai</span></h1>
-					<p>
-					I like to write and read VNs, study 日本語, and code fun apps on the side. Also a big enthusiast of riichi mahjong and tinkering with Linux
-					</p>
+				<div class="intro-aside">
+					<figure class="portrait">
+						<Image src={pfp} alt="daishi's profile picture" width={360} height={360} loading="eager" />
+						<figcaption>
+							pfp source <a href="https://x.com/nngw_000" target="_blank" rel="noreferrer">@nngw_000</a>
+						</figcaption>
+					</figure>
 					<div class="social-links">
 						<a href="https://x.com/46daishi" target="_blank">
 							<span class="sr-only">@46daishi</span>
@@ -89,6 +92,24 @@ const featuredProjects = projects
 						</a>
 					</div>
 				</div>
+				<div class="intro-copy">
+					<span class="section-kicker" lang="ja">自己紹介</span>
+					<h1 id="intro-heading">46<span>dai</span></h1>
+					<p class="intro-bio" data-typewriter>
+						<span class="intro-bio-ghost" aria-hidden="true">I like to write and read VNs, study 日本語, and code fun apps on the side. Also a big enthusiast of riichi mahjong and tinkering with Linux<span class="intro-bio-cursor-space"></span></span>
+						<span class="intro-bio-live"><span aria-hidden="true" data-typewriter-target></span><a
+							class="intro-bio-cursor"
+							href="#featured-projects"
+							aria-label="Continue to featured projects"
+							data-typewriter-cursor
+							style={`--cursor-sprite: url(${cursorSprite})`}
+						></a></span>
+						<span class="sr-only" data-typewriter-source>I like to write and read VNs, study 日本語, and code fun apps on the side. Also a big enthusiast of riichi mahjong and tinkering with Linux</span>
+					</p>
+					<blockquote class="intro-now">
+						<span class="now-label">now</span>: building the website, writing soul garden
+					</blockquote>
+				</div>
 			</section>
 
 			<HanaDivider />
@@ -96,7 +117,13 @@ const featuredProjects = projects
 			<FeaturedProjects projects={featuredProjects} />
 
 			{featuredPosts.length > 0 && (
-				<section class="featured-posts" aria-label="Featured posts">
+				<section class="featured-posts" aria-labelledby="featured-posts-heading">
+					<div class="section-heading">
+						<div>
+							<span class="section-kicker" lang="ja">特集</span>
+							<h2 id="featured-posts-heading">featured posts</h2>
+						</div>
+					</div>
 					<ul class="featured-post-tiles">
 						{featuredPosts.map((post) => (
 							<li>
@@ -109,7 +136,7 @@ const featuredProjects = projects
 										height={256}
 									/>
 									<span class="featured-post-tile-body">
-										<FormattedDate date={post.data.pubDate} />
+										<FormattedDate date={post.data.pubDate} format="ja" />
 										<span class="featured-post-tile-title">{post.data.title}</span>
 									</span>
 								</a>
@@ -122,10 +149,11 @@ const featuredProjects = projects
 			<section class="home-blog" aria-label="Posts and updates">
 				<section class="latest-posts" aria-labelledby="latest-posts-heading">
 					<div class="section-heading">
-						<h2 id="latest-posts-heading">latest blog posts</h2>
-						<PillLink href="/blog/" icon="\uee75">
-							All posts
-						</PillLink>
+						<div>
+							<span class="section-kicker" lang="ja">最新記事</span>
+							<h2 id="latest-posts-heading">latest blog posts</h2>
+						</div>
+						<SectionLink href="/blog/">all posts</SectionLink>
 					</div>
 					<ul>
 						{latestPosts.map((post) => {
@@ -152,7 +180,7 @@ const featuredProjects = projects
 												{post.data.title}
 											</a>
 											<div class="post-meta">
-												<FormattedDate date={post.data.pubDate} />
+												<FormattedDate date={post.data.pubDate} format="ja" />
 												{post.data.tags.map((tag) => (
 													<span class="post-tag">#{tag.trim().replace(/\s+/g, '-')}</span>
 												))}
@@ -176,7 +204,10 @@ const featuredProjects = projects
 
 				<section class="site-log" aria-labelledby="log-heading">
 					<div class="section-heading">
-						<h2 id="log-heading">log</h2>
+						<div>
+							<span class="section-kicker" lang="ja">日誌</span>
+							<h2 id="log-heading">log</h2>
+						</div>
 					</div>
 					<div class="log-terminal">
 						<div class="log-terminal-bar" aria-hidden="true">
@@ -192,8 +223,12 @@ const featuredProjects = projects
 							{renderedLogEntries.map(({ entry, Content }) => (
 								<li>
 									<article class="log-entry">
-										<time class="log-date" datetime={entry.data.date.toISOString()}>
-											{entry.data.date.toISOString().slice(0, 10)}
+										<time
+											class="log-date"
+											datetime={entry.data.date.toISOString()}
+											lang="ja"
+										>
+											{formatLogDate.format(entry.data.date)}
 										</time>
 										<div class="log-body">
 											<Content />
@@ -227,27 +262,57 @@ const featuredProjects = projects
 		padding-top: 0.5rem;
 	}
 
+	.intro-aside {
+		display: flex;
+		flex: 0 0 clamp(7.5rem, 16vw, 11rem);
+		flex-direction: column;
+	}
+
 	.portrait {
-		flex: 0 0 clamp(6.5rem, 16vw, 11rem);
+		position: relative;
+		overflow: hidden;
 		margin: 0;
+		border-radius: 0.75rem;
 	}
 
 	.portrait :global(img) {
+		display: block;
 		width: 100%;
 		height: auto;
-		border-radius: 12px;
+		border-radius: 0.75rem;
 	}
 
 	.portrait figcaption {
-		margin-top: 0.5rem;
-		color: hsl(var(--muted-foreground));
-		font-size: 0.7rem;
-		line-height: 1.5;
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		margin: 0;
+		padding: 1.5rem 0.35rem 0.35rem;
+		background: linear-gradient(180deg, transparent, rgb(0 0 0 / 0.78));
+		color: rgb(255 255 255 / 0.8);
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		line-height: 1.4;
 		text-align: center;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.16s ease;
+	}
+
+	.portrait figcaption a {
+		color: rgb(255 255 255 / 0.92);
+	}
+
+	.portrait:hover figcaption,
+	.portrait:focus-within figcaption {
+		opacity: 1;
+		pointer-events: auto;
 	}
 
 	.intro-copy {
-		max-width: 56ch;
+		flex: 1 1 auto;
+		min-width: 0;
 	}
 
 	.intro-copy h1 {
@@ -261,27 +326,108 @@ const featuredProjects = projects
 		color: hsl(var(--primary));
 	}
 
-	.intro-copy p {
-		max-width: 52ch;
+	.intro-bio {
+		position: relative;
+		max-width: 36rem;
 		margin: 0;
-		font-family: var(--font-serif);
-		font-size: 1.0625rem;
-		line-height: 1.7;
+		color: hsl(var(--foreground));
+		font-family: var(--font-sazanami);
+		font-size: 1.12rem;
+		line-height: 1.65;
+	}
+
+	:global(:root[data-theme='dark']) .intro-bio {
+		color: #fff;
+	}
+
+	:global(html.js) .intro-bio-ghost {
+		visibility: hidden;
+	}
+
+	.intro-bio-cursor-space {
+		display: inline-block;
+		width: calc(16px + 0.4rem);
+		height: 1px;
+	}
+
+	.intro-bio-live {
+		display: none;
+	}
+
+	:global(html.js) .intro-bio-live {
+		position: absolute;
+		inset: 0;
+		display: block;
+	}
+
+	.intro-bio-cursor {
+		display: none;
+		width: 16px;
+		height: 16px;
+		margin-left: 0.4rem;
+		vertical-align: -0.12em;
+		background-image: var(--cursor-sprite);
+		background-repeat: no-repeat;
+		background-position: 0 0;
+		background-size: 64px 16px;
+		image-rendering: pixelated;
+		text-decoration: none;
+		animation: intro-cursor-frames 0.7s steps(4) infinite;
+	}
+
+	:global(html.js) .intro-bio.is-complete .intro-bio-cursor {
+		display: inline-block;
+	}
+
+	@keyframes intro-cursor-frames {
+		to {
+			background-position-x: -64px;
+		}
+	}
+
+	.intro-now {
+		margin: 0.85rem 0 0;
+		padding: 0.4rem 0.65rem;
+		border-left: 2px solid hsl(var(--primary));
+		border-radius: 0 var(--radius) var(--radius) 0;
+		background: hsl(var(--muted) / 0.55);
+		color: hsl(var(--muted-foreground));
+		font-size: 0.82rem;
+		line-height: 1.6;
+	}
+
+	.now-label {
+		color: hsl(var(--foreground) / 0.8);
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.intro-now a {
+		color: inherit;
+		text-decoration-color: hsl(var(--muted-foreground) / 0.5);
+		text-underline-offset: 0.15em;
+	}
+
+	.intro-now a:hover,
+	.intro-now a:focus-visible {
+		color: hsl(var(--primary));
 	}
 
 	.social-links {
 		display: flex;
 		align-items: center;
-		gap: 0.25rem;
-		margin-top: 0.5rem;
+		justify-content: center;
+		gap: 0.1rem;
+		margin-top: 0.4rem;
 		color: hsl(var(--muted-foreground));
 	}
 
 	.social-links a {
 		display: grid;
 		place-items: center;
-		width: 32px;
-		height: 32px;
+		width: 30px;
+		height: 30px;
 		color: inherit;
 		text-decoration: none;
 		transition: color 0.16s ease;
@@ -298,7 +444,11 @@ const featuredProjects = projects
 	}
 
 	.featured-posts {
-		margin: 1.5rem 0 4rem;
+		margin: 3rem 0 3.5rem;
+	}
+
+	.featured-posts .section-heading {
+		margin-bottom: 0.75rem;
 	}
 
 	.featured-post-tiles {
@@ -332,9 +482,10 @@ const featuredProjects = projects
 	.featured-post-tile-image {
 		display: block;
 		width: 100%;
-		aspect-ratio: 18 / 5;
+		aspect-ratio: 12 / 5;
 		border: 0;
 		object-fit: cover;
+		object-position: center top;
 	}
 
 	.featured-post-tile-body {
@@ -345,19 +496,16 @@ const featuredProjects = projects
 		display: flex;
 		flex-direction: column;
 		gap: 0.1rem;
-		padding: 0.55rem 0.7rem 0.65rem;
-		background: hsl(0 0% 0% / 0.62);
+		padding: 2rem 0.7rem 0.6rem;
+		background: linear-gradient(180deg, transparent, rgb(0 0 0 / 0.82));
 		color: white;
-		opacity: 0;
-		transition: opacity 0.16s ease;
 	}
 
 	.featured-post-tile-body :global(time) {
-		color: rgb(255 255 255 / 0.75);
-		font-size: 0.7rem;
+		color: rgb(255 255 255 / 0.72);
+		font-size: 0.68rem;
 		letter-spacing: 0.04em;
 		line-height: 1.4;
-		text-transform: uppercase;
 	}
 
 	.featured-post-tile-title {
@@ -378,9 +526,9 @@ const featuredProjects = projects
 		border-color: hsl(var(--primary) / 0.5);
 	}
 
-	.featured-post-tile:hover .featured-post-tile-body,
-	.featured-post-tile:focus-visible .featured-post-tile-body {
-		opacity: 1;
+	.featured-post-tile:hover .featured-post-tile-title,
+	.featured-post-tile:focus-visible .featured-post-tile-title {
+		color: hsl(var(--primary));
 	}
 
 	.home-blog {
@@ -392,7 +540,7 @@ const featuredProjects = projects
 
 	.section-heading {
 		display: flex;
-		align-items: baseline;
+		align-items: flex-end;
 		justify-content: space-between;
 		gap: 1rem;
 		min-height: 1.5rem;
@@ -658,8 +806,9 @@ const featuredProjects = projects
 	}
 
 	@media (hover: none) {
-		.featured-post-tile-body {
+		.portrait figcaption {
 			opacity: 1;
+			pointer-events: auto;
 		}
 	}
 
@@ -674,20 +823,24 @@ const featuredProjects = projects
 			padding-top: 0.5rem;
 		}
 
-		.portrait {
-			flex-basis: 6.5rem;
+		.intro-aside {
+			flex-basis: 7rem;
 		}
 
 		.intro-copy h1 {
 			font-size: 2.25rem;
 		}
 
-		.intro-copy p {
-			font-size: 1rem;
+		.intro-bio {
+			font-size: 1.04rem;
+		}
+
+		.intro-now {
+			font-size: 0.76rem;
 		}
 
 		.featured-posts {
-			margin: 1.25rem 0 3rem;
+			margin: 2.5rem 0 2.5rem;
 		}
 
 		.featured-post-tiles {
@@ -725,12 +878,47 @@ const featuredProjects = projects
 		.latest-post-title,
 		.latest-post img,
 		.featured-post-tile,
-		.featured-post-tile-body {
+		.portrait figcaption {
 			transition: none;
 		}
 
+		.intro-bio-cursor,
 		.log-terminal-cursor {
 			animation: none;
 		}
 	}
 </style>
+
+<script>
+	const bio = document.querySelector<HTMLElement>('[data-typewriter]');
+	const source = bio?.querySelector<HTMLElement>('[data-typewriter-source]');
+	const target = bio?.querySelector<HTMLElement>('[data-typewriter-target]');
+
+	if (bio && source && target) {
+		const text = (source.textContent ?? '').replace(/\s+/g, ' ').trim();
+		const characters = Array.from(text);
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		let index = 0;
+
+		const complete = () => {
+			bio.classList.add('is-complete');
+		};
+
+		const typeNext = () => {
+			if (index >= characters.length) {
+				complete();
+				return;
+			}
+
+			target.textContent += characters[index++];
+			window.setTimeout(typeNext, 14);
+		};
+
+		if (reducedMotion) {
+			target.textContent = text;
+			complete();
+		} else {
+			window.setTimeout(typeNext, 180);
+		}
+	}
+</script>

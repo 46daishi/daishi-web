@@ -23,6 +23,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <script is:inline>
 	(() => {
+		document.documentElement.classList.add('js');
 		const key = 'daishi-theme';
 		let theme;
 		try {
@@ -47,6 +48,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 
 <Font cssVariable="--font-mono" preload />
 <Font cssVariable="--font-serif" preload />
+<Font cssVariable="--font-sazanami" preload />
 <Font cssVariable="--font-symbols" preload />
 
 <!-- Canonical URL -->

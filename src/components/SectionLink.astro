@@ -1,0 +1,51 @@
+---
+interface Props {
+	href: string;
+}
+
+const { href } = Astro.props;
+---
+
+<a class="section-link" href={href}>
+	<slot />
+	<span class="section-link-icon" aria-hidden="true">{'\uf061'}</span>
+</a>
+
+<style>
+	.section-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding-bottom: 0.1rem;
+		color: hsl(var(--muted-foreground));
+		font-size: 0.72rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		line-height: 1.3;
+		text-decoration: none;
+		transition: color 0.16s ease;
+	}
+
+	.section-link:hover,
+	.section-link:focus-visible {
+		color: hsl(var(--primary));
+	}
+
+	.section-link-icon {
+		font-family: var(--font-symbols);
+		font-size: 0.85em;
+		transition: transform 0.16s ease;
+	}
+
+	.section-link:hover .section-link-icon,
+	.section-link:focus-visible .section-link-icon {
+		transform: translateX(2px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.section-link,
+		.section-link-icon {
+			transition: none;
+		}
+	}
+</style>

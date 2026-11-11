@@ -104,6 +104,22 @@ export default defineConfig({
         },
         {
             provider: fontProviders.local(),
+            name: 'Sazanami Gothic',
+            cssVariable: '--font-sazanami',
+            fallbacks: ['Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP', 'sans-serif'],
+            options: {
+                variants: [
+                    {
+                        src: ['./src/assets/fonts/sazanami-gothic.woff2'],
+                        weight: 400,
+                        style: 'normal',
+                        display: 'swap',
+                    },
+                ],
+            },
+        },
+        {
+            provider: fontProviders.local(),
             name: 'Symbols Nerd Font',
             cssVariable: '--font-symbols',
             fallbacks: ['monospace'],
