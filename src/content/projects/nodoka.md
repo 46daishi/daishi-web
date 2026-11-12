@@ -1,6 +1,6 @@
 ---
 title: nodoka
-description: Pomodoro timer and time tracker with profiles.
+description: Minimalist pomodoro timer and time tracker with profiles and detailed statistics.
 icon: '../../assets/icons/nodoka.png'
 color: '#24aaf2'
 type: software

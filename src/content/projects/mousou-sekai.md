@@ -1,6 +1,6 @@
 ---
 title: Mousou//Sekai
-description: Supernatural Action Visual Novel. Second entry in the HnK series.
+description: A story of Angels who drag humanity into supernatural battles for their own gains, and of human conspiracies trying to make use of it all.
 icon: '../../assets/icons/mousou-sekai.png'
 color: '#D11515'
 type: visual-novel

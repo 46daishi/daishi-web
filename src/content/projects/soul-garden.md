@@ -1,6 +1,6 @@
 ---
 title: Soul Garden
-description: Action Mystery Light Novel connected to the HnK series.
+description: Urban fantasy about a soul-reader that hunts and eliminates dangerous ability users following a global catastrophe.
 icon: '../../assets/icons/soul-garden.png'
 color: '#008aff'
 type: light-novel

@@ -1,6 +1,6 @@
 ---
 title: tomoyo
-description: Anki-less immersion app for learning Japanese.
+description: Japanese immersion app with pop-up lookups, known-word highlighting, and built-in reviewing.
 icon: '../../assets/icons/tomoyo.png'
 color: '#466db5'
 type: software

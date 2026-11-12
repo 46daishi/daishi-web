@@ -1,0 +1,234 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { PROJECT_TYPE_LABELS } from '../consts';
+import ProjectStatus from './ProjectStatus.astro';
+
+type Props = {
+	project: CollectionEntry<'projects'>;
+};
+
+const { project } = Astro.props;
+const { title, description, icon, status, version, links, color, type } = project.data;
+const projectHref = `/projects/${project.id}/`;
+const typeIcon =
+	type === 'software' ? '\uf121' : type === 'light-novel' ? '\u{f05da}' : '\u{f02d5}';
+const isExternal = (href: string) => /^https?:\/\//.test(href);
+---
+
+<article class="project" style={`--project-color: ${color};`}>
+	<div class="project-header">
+		<a class="project-icon-link" href={projectHref} tabindex="-1" aria-hidden="true">
+			<Image class="project-icon" src={icon} alt="" width={160} height={160} />
+		</a>
+		<div class="project-heading">
+			<a class="project-title" href={projectHref}>
+				<h3>{title}</h3>
+			</a>
+			<div class="project-meta">
+				<div class="project-type">
+					<span class="project-type-icon" aria-hidden="true">{typeIcon}</span>
+					<span>{PROJECT_TYPE_LABELS[type]}</span>
+				</div>
+				<div class="project-status-version">
+					<ProjectStatus status={status} />
+					{version && <span class="project-version">{version}</span>}
+				</div>
+			</div>
+		</div>
+	</div>
+	<p class="project-description">{description}</p>
+	{links.length > 0 && (
+		<ul class="project-actions" aria-label={`${title} links`}>
+			{links.map((link) => (
+				<li>
+					<a
+						href={link.href}
+						target={isExternal(link.href) ? '_blank' : undefined}
+						rel={isExternal(link.href) ? 'noreferrer' : undefined}
+					>
+						{link.icon && (
+							<span class="project-action-icon" aria-hidden="true">
+								{link.icon}
+							</span>
+						)}
+						<span class="project-action-label">{link.label}</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	)}
+</article>
+
+<style>
+	.project {
+		--project-ink: color-mix(in srgb, var(--project-color) 60%, hsl(var(--foreground)));
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		padding: 1rem;
+		border: 1px solid hsl(var(--border));
+		border-radius: 0.75rem;
+		transition: border-color 0.18s ease;
+	}
+
+	.project:hover,
+	.project:focus-within {
+		border-color: color-mix(in srgb, var(--project-color) 32%, hsl(var(--border)));
+	}
+
+	.project-header {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+		width: 100%;
+	}
+
+	.project-icon-link {
+		display: flex;
+		flex: 0 0 auto;
+		overflow: hidden;
+		border-radius: 0.65rem;
+	}
+
+	.project-icon {
+		width: 56px;
+		height: 56px;
+		border: 0;
+		transition: transform 0.18s ease;
+	}
+
+	.project:hover .project-icon,
+	.project:focus-within .project-icon {
+		transform: scale(1.04);
+	}
+
+	.project-heading {
+		min-width: 0;
+	}
+
+	.project-title {
+		color: hsl(var(--foreground));
+		text-decoration: none;
+	}
+
+	.project-heading h3 {
+		margin: 0;
+		font-family: var(--font-sazanami);
+		font-size: 1.06rem;
+		font-weight: 700;
+		letter-spacing: -0.015em;
+		line-height: 1.3;
+		transition: color 0.16s ease;
+	}
+
+	.project:hover .project-title h3,
+	.project:focus-within .project-title h3,
+	.project-title:focus-visible h3 {
+		color: var(--project-ink);
+	}
+
+	.project-meta {
+		display: grid;
+		gap: 0.25rem;
+		margin-top: 0.35rem;
+	}
+
+	.project-status-version {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.project-version {
+		color: hsl(var(--foreground));
+		font-size: 0.72rem;
+		font-weight: 700;
+		line-height: 1.4;
+		white-space: nowrap;
+	}
+
+	.project-type {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		color: hsl(var(--foreground) / 0.72);
+		font-family: var(--font-sazanami);
+		font-size: 0.75rem;
+		line-height: 1.4;
+		text-transform: lowercase;
+	}
+
+	.project-type-icon,
+	.project-action-icon {
+		display: inline-flex;
+		font-family: 'Symbols Nerd Font', var(--font-symbols);
+		line-height: 1;
+	}
+
+	.project-type-icon {
+		font-size: 0.85rem;
+	}
+
+	.project-description {
+		margin: 0.8rem 0 0;
+		color: hsl(var(--foreground));
+		font-family: var(--font-sazanami);
+		font-size: 0.95rem;
+		line-height: 1.65;
+		text-wrap: pretty;
+	}
+
+	.project-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1.1rem;
+		margin: auto 0 0;
+		padding: 1.1rem 0 0;
+		list-style: none;
+	}
+
+	.project-actions a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: hsl(var(--foreground) / 0.76);
+		font-family: var(--font-sazanami);
+		font-size: 0.8rem;
+		font-weight: 600;
+		line-height: 1.5;
+		text-decoration: none;
+		transition: color 0.16s ease;
+	}
+
+	.project-actions a:hover,
+	.project-actions a:focus-visible {
+		color: var(--project-ink);
+	}
+
+	.project-action-label {
+		text-decoration: underline transparent;
+		text-underline-offset: 0.22rem;
+		transition: text-decoration-color 0.16s ease;
+	}
+
+	.project-actions a:hover .project-action-label,
+	.project-actions a:focus-visible .project-action-label {
+		text-decoration-color: currentColor;
+	}
+
+	.project-action-icon {
+		font-size: 0.95rem;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.project,
+		.project-title h3,
+		.project-actions a,
+		.project-action-label,
+		.project-icon {
+			transition: none;
+		}
+	}
+</style>

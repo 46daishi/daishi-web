@@ -1,6 +1,6 @@
 ---
 title: Spring Poems
-description: Drama Mystery Visual Novel. First entry in the HnK series.
+description: Supernatural mystery following an artist haunted by deaths, disappearances, and phantoms of the past.
 icon: '../../assets/icons/spring-poems.png'
 color: '#ff78c4'
 type: visual-novel

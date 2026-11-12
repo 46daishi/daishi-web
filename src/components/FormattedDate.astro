@@ -16,4 +16,4 @@ const formatted =
 			});
 ---
 
-<time datetime={date.toISOString()}>{formatted}</time>
+<time datetime={date.toISOString()} lang={format === 'ja' ? 'ja' : undefined}>{formatted}</time>

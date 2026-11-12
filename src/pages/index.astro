@@ -107,7 +107,7 @@ const featuredProjects = projects
 						<span class="sr-only" data-typewriter-source>I like to write and read VNs, study 日本語, and code fun apps on the side. Also a big enthusiast of riichi mahjong and tinkering with Linux</span>
 					</p>
 					<blockquote class="intro-now">
-						<span class="now-label">now</span>: building the website, writing soul garden
+						<span class="now-label">status</span>: building the website, writing soul garden
 					</blockquote>
 				</div>
 			</section>
@@ -502,9 +502,14 @@ const featuredProjects = projects
 	}
 
 	.featured-post-tile-body :global(time) {
-		color: rgb(255 255 255 / 0.72);
-		font-size: 0.68rem;
-		letter-spacing: 0.04em;
+		align-self: flex-start;
+		padding: 0.15rem 0.4rem;
+		border-radius: var(--radius);
+		background: rgb(0 0 0 / 0.82);
+		color: #fff;
+		font-size: 0.72rem;
+		font-weight: 600;
+		letter-spacing: 0.02em;
 		line-height: 1.4;
 	}
 
