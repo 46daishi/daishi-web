@@ -33,6 +33,18 @@ const { title, description, image = FallbackImage } = Astro.props;
 			theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 		}
 		document.documentElement.dataset.theme = theme;
+		window.addEventListener('message', (event) => {
+			if (window.parent === window || event.origin !== window.location.origin) return;
+			const message = event.data;
+			if (
+				!message ||
+				message.type !== 'daishi-theme-change' ||
+				(message.theme !== 'light' && message.theme !== 'dark')
+			) {
+				return;
+			}
+			document.documentElement.dataset.theme = message.theme;
+		});
 	})();
 </script>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />

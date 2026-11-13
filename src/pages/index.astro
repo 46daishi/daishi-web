@@ -2,9 +2,9 @@
 import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import pfp from '../assets/pfp.jpg';
-import blogFallback from '../assets/blog-placeholder-1.jpg';
 import cursorSprite from '../assets/icons/cursor0.bmp?url';
 import BaseHead from '../components/BaseHead.astro';
+import BlogPostPreview from '../components/BlogPostPreview.astro';
 import FeaturedProjects from '../components/FeaturedProjects.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
@@ -128,13 +128,23 @@ const featuredProjects = projects
 						{featuredPosts.map((post) => (
 							<li>
 								<a class="featured-post-tile" href={`/blog/${post.id}/`}>
-									<Image
-										class="featured-post-tile-image"
-										src={post.data.heroImage ?? blogFallback}
-										alt=""
-										width={640}
-										height={256}
-									/>
+									{post.data.heroImage ? (
+										<Image
+											class="featured-post-tile-image"
+											src={post.data.heroImage}
+											alt=""
+											width={640}
+											height={256}
+										/>
+									) : (
+										<span class="featured-post-tile-preview" aria-hidden="true">
+											<BlogPostPreview
+												postId={post.id}
+												title={post.data.title}
+												homepagePreview="featured"
+											/>
+										</span>
+									)}
 									<span class="featured-post-tile-body">
 										<FormattedDate date={post.data.pubDate} format="ja" />
 										<span class="featured-post-tile-title">{post.data.title}</span>
@@ -150,7 +160,7 @@ const featuredProjects = projects
 				<section class="latest-posts" aria-labelledby="latest-posts-heading">
 					<div class="section-heading">
 						<div>
-							<span class="section-kicker" lang="ja">最新記事</span>
+							<span class="section-kicker" lang="ja">新着記事</span>
 							<h2 id="latest-posts-heading">latest blog posts</h2>
 						</div>
 						<SectionLink href="/blog/">all posts</SectionLink>
@@ -168,12 +178,17 @@ const featuredProjects = projects
 											tabindex="-1"
 											aria-hidden="true"
 										>
-											<Image
-												src={post.data.heroImage ?? blogFallback}
-												alt=""
-												width={320}
-												height={180}
-											/>
+											{post.data.heroImage ? (
+												<Image src={post.data.heroImage} alt="" width={320} height={180} />
+											) : (
+												<span class="latest-post-preview" aria-hidden="true">
+													<BlogPostPreview
+														postId={post.id}
+														title={post.data.title}
+														homepagePreview="recent"
+													/>
+												</span>
+											)}
 										</a>
 										<div class="latest-post-body">
 											<a class="latest-post-title" href={`/blog/${post.id}/`}>
@@ -488,6 +503,15 @@ const featuredProjects = projects
 		object-position: center top;
 	}
 
+	.featured-post-tile-preview {
+		position: relative;
+		display: block;
+		width: 100%;
+		aspect-ratio: 12 / 5;
+		overflow: hidden;
+		border-bottom: 1px solid hsl(var(--border));
+	}
+
 	.featured-post-tile-body {
 		position: absolute;
 		right: 0;
@@ -519,7 +543,7 @@ const featuredProjects = projects
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
 		color: white;
-		font-family: var(--font-serif);
+		font-family: var(--font-sazanami);
 		font-size: 1rem;
 		font-weight: 700;
 		letter-spacing: -0.01em;
@@ -644,6 +668,15 @@ const featuredProjects = projects
 		transition: border-color 0.16s ease;
 	}
 
+	.latest-post-preview {
+		position: relative;
+		display: block;
+		width: 64px;
+		height: 64px;
+		overflow: hidden;
+		border: 1px solid hsl(var(--border));
+	}
+
 	.latest-post-body {
 		display: grid;
 		gap: 0.15rem;
@@ -652,7 +685,7 @@ const featuredProjects = projects
 
 	.latest-post-title {
 		color: hsl(var(--foreground));
-		font-family: var(--font-serif);
+		font-family: var(--font-sazanami);
 		font-size: 1.05rem;
 		font-weight: 700;
 		letter-spacing: -0.01em;

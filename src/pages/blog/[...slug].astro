@@ -3,18 +3,26 @@ import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
-	const posts = await getCollection('blog');
+	const [posts, projects] = await Promise.all([getCollection('blog'), getCollection('projects')]);
+	const projectColors = new Map(projects.map((project) => [project.id, project.data.color]));
+
 	return posts.map((post) => ({
 		params: { slug: post.id },
-		props: post,
+		props: {
+			post,
+			projectColor: post.data.project ? projectColors.get(post.data.project) : undefined,
+		},
 	}));
 }
-type Props = CollectionEntry<'blog'>;
+type Props = {
+	post: CollectionEntry<'blog'>;
+	projectColor?: string;
+};
 
-const post = Astro.props;
+const { post, projectColor } = Astro.props;
 const { Content } = await render(post);
 ---
 
-<BlogPost {...post.data}>
+<BlogPost {...post.data} projectColor={projectColor}>
 	<Content />
 </BlogPost>

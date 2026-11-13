@@ -1,63 +1,329 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
-import Layout from '../layouts/BlogPost.astro';
+import { Image } from 'astro:assets';
+import mediaPlaceholder1 from '../assets/blog-placeholder-1.jpg';
+import mediaPlaceholder2 from '../assets/blog-placeholder-2.jpg';
+import mediaPlaceholder3 from '../assets/blog-placeholder-3.jpg';
+import mediaPlaceholder4 from '../assets/blog-placeholder-4.jpg';
+import mediaPlaceholder5 from '../assets/blog-placeholder-5.jpg';
+import pfp from '../assets/pfp.jpg';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import HanaDivider from '../components/HanaDivider.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+
+const favoriteMedia = [
+	{ title: 'Title placeholder 1', type: 'Media type', cover: mediaPlaceholder1 },
+	{ title: 'Title placeholder 2', type: 'Media type', cover: mediaPlaceholder2 },
+	{ title: 'Title placeholder 3', type: 'Media type', cover: mediaPlaceholder3 },
+	{ title: 'Title placeholder 4', type: 'Media type', cover: mediaPlaceholder4 },
+	{ title: 'Title placeholder 5', type: 'Media type', cover: mediaPlaceholder5 },
+];
 ---
 
-<Layout
-	title="About Me"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
-	heroImage={AboutHeroImage}
->
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
-	</p>
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`about | ${SITE_TITLE}`}
+			description="A little about daishi: writing, visual novels, Japanese, riichi mahjong, and Linux."
+		/>
+	</head>
+	<body>
+		<Header />
+		<main class="about-page">
+			<header class="page-intro">
+				<span class="section-kicker" lang="ja">自己紹介</span>
+				<h1>46<span>dai</span></h1>
+			</header>
 
-	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
-	</p>
+			<section class="about-intro" aria-label="About daishi">
+				<figure class="about-portrait">
+					<Image src={pfp} alt="daishi's profile picture" width={360} height={360} />
+					<figcaption>
+						pfp source <a href="https://x.com/nngw_000" target="_blank" rel="noreferrer">@nngw_000</a>
+					</figcaption>
+				</figure>
 
-	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
-	</p>
+				<div class="about-copy">
+					<p class="about-lead">
+						I like to write and read VNs, study 日本語, and code fun apps on the side. Also a big
+						enthusiast of riichi mahjong and tinkering with Linux
+					</p>
+				</div>
+			</section>
 
-	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
-	</p>
+			<HanaDivider />
 
-	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
-	</p>
-</Layout>
+			<section class="interests" aria-labelledby="interests-heading">
+				<header class="section-heading">
+					<div>
+						<span class="section-kicker" lang="ja">趣味</span>
+						<h2 id="interests-heading">interests</h2>
+					</div>
+				</header>
+
+				<ul class="interest-grid">
+					<li>
+						<h3>Visual novels</h3>
+						<p>I enjoy visual novels as both a reader and a writer and have been reading them since 2020.</p>
+					</li>
+					<li>
+						<h3>Japanese</h3>
+						<p>I'm studying 日本語 and working toward getting more comfortable with it.</p>
+					</li>
+					<li>
+						<h3>Riichi mahjong</h3>
+						<p>Causes great damage to the human spirit without a single benefit.</p>
+					</li>
+					<li>
+						<h3>Linux &amp; app development</h3>
+						<p>I like tinkering with Linux and building useful or just-for-fun software.</p>
+					</li>
+				</ul>
+			</section>
+
+			<section class="favorite-media" aria-labelledby="favorite-media-heading">
+				<header class="section-heading">
+					<div>
+						<span class="section-kicker" lang="ja">お気に入り</span>
+						<h2 id="favorite-media-heading">favorite media</h2>
+					</div>
+				</header>
+
+				<ul class="favorite-media-grid">
+					{favoriteMedia.map((media) => (
+						<li>
+							<article class="media-card">
+								<div class="media-cover">
+									<Image src={media.cover} alt="" width={320} height={480} />
+								</div>
+								<h3>{media.title}</h3>
+								<p>{media.type}</p>
+							</article>
+						</li>
+					))}
+				</ul>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.about-page {
+		max-width: 932px;
+	}
+
+	.page-intro {
+		margin-bottom: 1.5rem;
+	}
+
+	.page-intro h1 {
+		margin: 0.05rem 0 0;
+		font-size: clamp(2.5rem, 6vw, 3.5rem);
+		line-height: 1;
+		letter-spacing: -0.07em;
+	}
+
+	.page-intro h1 span {
+		color: hsl(var(--primary));
+	}
+
+	.about-intro {
+		display: grid;
+		grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+		align-items: center;
+		gap: 2rem;
+	}
+
+	.about-portrait {
+		position: relative;
+		overflow: hidden;
+		margin: 0;
+		border-radius: 0.75rem;
+	}
+
+	.about-portrait :global(img) {
+		display: block;
+		width: 100%;
+		aspect-ratio: 1;
+		border: 0;
+		border-radius: inherit;
+		object-fit: cover;
+	}
+
+	.about-portrait figcaption {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		margin: 0;
+		padding: 1.5rem 0.35rem 0.35rem;
+		background: linear-gradient(180deg, transparent, rgb(0 0 0 / 0.78));
+		color: rgb(255 255 255 / 0.85);
+		font-size: 0.65rem;
+		line-height: 1.4;
+		text-align: center;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.16s ease;
+	}
+
+	.about-portrait:hover figcaption,
+	.about-portrait:focus-within figcaption {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.about-portrait figcaption a {
+		color: inherit;
+	}
+
+	.about-copy {
+		color: hsl(var(--foreground) / 0.88);
+		font-family: var(--font-sazanami);
+		font-size: 1.05rem;
+		line-height: 1.75;
+	}
+
+	.about-copy p {
+		margin: 0 0 0.85rem;
+	}
+
+	.about-copy .about-lead {
+		margin-bottom: 0.5rem;
+		color: hsl(var(--foreground));
+		font-size: 1.35rem;
+		font-weight: 700;
+		line-height: 1.4;
+	}
+
+	.about-socials {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 1rem;
+		margin-top: 1.1rem;
+		font-family: var(--font-mono);
+		font-size: 0.85rem;
+		font-weight: 600;
+	}
+
+	.section-heading {
+		margin-bottom: 1rem;
+	}
+
+	.section-heading h2 {
+		margin: 0;
+		font-family: var(--font-sazanami);
+	}
+
+	.interest-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.interest-grid li {
+		padding: 1rem 1.1rem;
+		border: 1px solid hsl(var(--border));
+		border-radius: 0.75rem;
+		background: hsl(var(--card));
+	}
+
+	.interest-grid h3 {
+		margin: 0 0 0.4rem;
+		font-family: var(--font-sazanami);
+		font-size: 1.05rem;
+	}
+
+	.interest-grid p {
+		margin: 0;
+		color: hsl(var(--foreground) / 0.82);
+		font-family: var(--font-sazanami);
+		font-size: 0.92rem;
+		line-height: 1.65;
+	}
+
+	.favorite-media {
+		margin-top: 2.5rem;
+	}
+
+	.favorite-media-grid {
+		display: grid;
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+		gap: 1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.media-card {
+		min-width: 0;
+	}
+
+	.media-cover {
+		aspect-ratio: 2 / 3;
+		overflow: hidden;
+		border: 1px solid hsl(var(--border));
+		border-radius: 0.5rem;
+		background: hsl(var(--muted));
+	}
+
+	.media-cover :global(img) {
+		width: 100%;
+		height: 100%;
+		border: 0;
+		object-fit: cover;
+	}
+
+	.media-card h3 {
+		margin: 0.6rem 0 0.15rem;
+		font-family: var(--font-sazanami);
+		font-size: 0.95rem;
+		line-height: 1.4;
+	}
+
+	.media-card p {
+		margin: 0;
+		color: hsl(var(--muted-foreground));
+		font-size: 0.72rem;
+		line-height: 1.5;
+	}
+
+	@media (max-width: 760px) {
+		.favorite-media-grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 620px) {
+		.about-intro {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 1.25rem;
+		}
+
+		.about-portrait {
+			width: min(100%, 220px);
+		}
+
+		.interest-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	@media (max-width: 420px) {
+		.favorite-media-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.about-portrait figcaption {
+			transition: none;
+		}
+	}
+</style>

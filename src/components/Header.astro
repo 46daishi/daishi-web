@@ -89,6 +89,9 @@ const navItems = [
 	const setTheme = (theme) => {
 		root.dataset.theme = theme;
 		syncTheme();
+		document.querySelectorAll('iframe').forEach((frame) => {
+			frame.contentWindow?.postMessage({ type: 'daishi-theme-change', theme }, window.location.origin);
+		});
 	};
 
 	toggle?.addEventListener('click', () => {

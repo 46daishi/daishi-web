@@ -1,0 +1,33 @@
+---
+type Props = {
+	postId: string;
+	title: string;
+	homepagePreview?: 'featured' | 'recent';
+};
+
+const { postId, title, homepagePreview } = Astro.props;
+const previewQuery = homepagePreview ? `?homepagePreview=${homepagePreview}` : '';
+---
+
+<iframe
+	class="post-page-preview-frame"
+	src={`/blog/${postId}/${previewQuery}`}
+	title={`Preview of ${title}`}
+	loading="lazy"
+	tabindex="-1"
+	aria-hidden="true"
+></iframe>
+
+<style>
+	.post-page-preview-frame {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 200%;
+		height: 200%;
+		border: 0;
+		transform: scale(0.5);
+		transform-origin: top left;
+		pointer-events: none;
+	}
+</style>

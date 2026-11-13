@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
+import BlogPostPreview from '../../components/BlogPostPreview.astro';
 import Footer from '../../components/Footer.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
@@ -32,12 +33,14 @@ const projectFilters = (await getCollection('projects'))
 			<header class="page-intro">
 				<span class="section-kicker" lang="ja">日記</span>
 				<h1>blog</h1>
-				<p>Writing, projects, and things I’ve been thinking about.</p>
 			</header>
 
 			<div class="filter-panel">
 				<nav class="filter-row" aria-label="Filter posts by tag">
-					<span class="filter-label">tag</span>
+					<span class="filter-label">
+						<span class="filter-label-icon" aria-hidden="true">{'\uf292'}</span>
+						tag
+					</span>
 					<div class="filter-options">
 						<button class="tag-filter is-active" type="button" data-tag-filter="all" aria-pressed="true">
 							all
@@ -50,7 +53,10 @@ const projectFilters = (await getCollection('projects'))
 					</div>
 				</nav>
 				<nav class="filter-row" aria-label="Filter posts by project">
-					<span class="filter-label">project</span>
+					<span class="filter-label">
+						<span class="filter-label-icon" aria-hidden="true">{'\uf005'}</span>
+						project
+					</span>
 					<div class="filter-options">
 						<button class="tag-filter is-active" type="button" data-project-filter="all" aria-pressed="true">
 							all
@@ -62,6 +68,13 @@ const projectFilters = (await getCollection('projects'))
 								data-project-filter={project.id}
 								aria-pressed="false"
 							>
+								<Image
+									class="project-filter-icon"
+									src={project.data.icon}
+									alt=""
+									width={20}
+									height={20}
+								/>
 								{project.data.title}
 							</button>
 						))}
@@ -89,6 +102,11 @@ const projectFilters = (await getCollection('projects'))
 										src={post.data.heroImage}
 										alt=""
 									/>
+								)}
+								{!post.data.heroImage && (
+									<div class="post-preview" aria-hidden="true">
+										<BlogPostPreview postId={post.id} title={post.data.title} />
+									</div>
 								)}
 								<div class="post-card-body">
 									<FormattedDate date={post.data.pubDate} format="ja" />
@@ -171,7 +189,7 @@ const projectFilters = (await getCollection('projects'))
 	}
 
 	.page-intro h1 {
-		margin: 0.15rem 0 0.4rem;
+		margin: 0.05rem 0 0.4rem;
 	}
 
 	.page-intro p {
@@ -198,12 +216,21 @@ const projectFilters = (await getCollection('projects'))
 	}
 
 	.filter-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
 		flex: 0 0 auto;
 		color: hsl(var(--muted-foreground));
 		font-size: 0.7rem;
 		font-weight: 700;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
+	}
+
+	.filter-label-icon {
+		font-family: var(--font-symbols);
+		font-size: 0.85rem;
+		line-height: 1;
 	}
 
 	.filter-options {
@@ -213,6 +240,9 @@ const projectFilters = (await getCollection('projects'))
 	}
 
 	.tag-filter {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
 		padding: 0.2rem 0.5rem;
 		border: 1px solid transparent;
 		border-radius: var(--radius);
@@ -225,6 +255,15 @@ const projectFilters = (await getCollection('projects'))
 			color 0.16s ease,
 			border-color 0.16s ease,
 			background-color 0.16s ease;
+	}
+
+	.project-filter-icon {
+		width: 1rem;
+		height: 1rem;
+		margin: 0;
+		border: 0;
+		border-radius: 0.2rem;
+		object-fit: cover;
 	}
 
 	.tag-filter:hover,
@@ -289,6 +328,13 @@ const projectFilters = (await getCollection('projects'))
 		transition: opacity 0.16s ease;
 	}
 
+	.post-preview {
+		position: relative;
+		aspect-ratio: 2 / 1;
+		overflow: hidden;
+		border-bottom: 1px solid hsl(var(--border));
+	}
+
 	.post-card:hover .post-image,
 	.post-card:focus-within .post-image {
 		opacity: 0.88;
@@ -305,7 +351,7 @@ const projectFilters = (await getCollection('projects'))
 
 	.post-title {
 		margin: 0.25rem 0 0.35rem;
-		font-family: var(--font-serif);
+		font-family: var(--font-sazanami);
 		font-size: 1.2rem;
 		font-weight: 700;
 		letter-spacing: -0.02em;
@@ -333,8 +379,9 @@ const projectFilters = (await getCollection('projects'))
 		margin: 0;
 		padding: 0 1rem 0.9rem;
 		list-style: none;
-		color: hsl(var(--foreground) / 0.78);
+		color: hsl(var(--foreground));
 		font-size: 0.78rem;
+		font-weight: 600;
 	}
 
 	.empty-state {

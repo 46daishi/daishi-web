@@ -7,14 +7,87 @@ import FormattedDate from '../components/FormattedDate.astro';
 import HanaDivider from '../components/HanaDivider.astro';
 import Header from '../components/Header.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = Omit<CollectionEntry<'blog'>['data'], 'tags'> & {
+	projectColor?: string;
+	tags?: string[];
+};
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const {
+	title,
+	description,
+	pubDate,
+	updatedDate,
+	heroImage,
+	tags = [],
+	project,
+	projectColor,
+} = Astro.props;
 ---
 
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} />
+		<script is:inline>
+			const homepagePreview = new URLSearchParams(window.location.search).get('homepagePreview');
+			if (homepagePreview === 'featured' || homepagePreview === 'recent') {
+				document.documentElement.dataset.homepagePreview = homepagePreview;
+			}
+		</script>
+		<style is:global>
+			html[data-homepage-preview='featured'] .site-nav,
+			html[data-homepage-preview='featured'] .header-actions,
+			html[data-homepage-preview='recent'] .site-nav,
+			html[data-homepage-preview='recent'] .header-actions,
+			html[data-homepage-preview='recent'] main,
+			html[data-homepage-preview='recent'] footer {
+				display: none !important;
+			}
+			html[data-homepage-preview='recent'],
+			html[data-homepage-preview='recent'] body {
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			html[data-homepage-preview='recent'] .site-header {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				height: 100%;
+				border: 0;
+				background: transparent;
+			}
+			html[data-homepage-preview='recent'] .header-inner {
+				flex-direction: column;
+				flex-wrap: nowrap;
+				align-items: center;
+				justify-content: center;
+				gap: 0;
+				width: 100%;
+				max-width: none;
+				height: 100%;
+				min-height: 0;
+				margin: 0;
+				padding: 0.5rem;
+			}
+			html[data-homepage-preview='recent'] .brand {
+				flex-direction: column;
+				gap: 0.25rem;
+				min-height: 0;
+			}
+			html[data-homepage-preview='recent'] .brand-mark {
+				flex: 0 0 48px;
+				width: 48px;
+				height: 48px;
+			}
+			html[data-homepage-preview='recent'] .brand-mark img {
+				width: 48px;
+				height: 48px;
+			}
+			html[data-homepage-preview='recent'] .brand-name {
+				font-size: 18px;
+			}
+		</style>
 		<style>
 			main {
 				width: calc(100% - 2em);
@@ -23,19 +96,27 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			}
 			.hero-image {
 				width: 100%;
+				max-width: 76ch;
+				height: clamp(120px, 20vw, 220px);
+				margin: 0 auto 2rem;
+				overflow: hidden;
+				border-radius: 12px;
 			}
 			.hero-image img {
 				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				object-position: center 40%;
 				box-shadow: var(--box-shadow);
 			}
 			.prose {
-				width: 78ch;
+				width: 84ch;
 				max-width: calc(100% - 2em);
 				margin: auto;
 				padding: 1em;
 				color: rgb(var(--gray-dark));
+				font-family: var(--font-sazanami);
 			}
 			.title {
 				margin-bottom: 1em;
@@ -47,11 +128,42 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				margin: 0 0 0.5em 0;
 			}
 			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
+				margin-bottom: 0.75em;
+				color: hsl(var(--foreground));
+				font-size: 0.95rem;
+				font-weight: 700;
+				line-height: 1.6;
 			}
 			.last-updated-on {
-				font-style: italic;
+				margin-top: 0.25rem;
+				color: hsl(var(--muted-foreground));
+				font-size: 0.8rem;
+				font-style: normal;
+				font-weight: 500;
+			}
+			.post-tags {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+				gap: 0.35rem 0.85rem;
+				margin: 1rem 0 0;
+				padding: 0;
+				list-style: none;
+				font-family: var(--font-mono);
+				font-size: 0.8rem;
+				font-weight: 600;
+				line-height: 1.6;
+			}
+			.post-tag {
+				color: hsl(var(--foreground) / 0.9);
+			}
+			.post-project {
+				color: var(--project-color, hsl(var(--primary)));
+				text-decoration: none;
+			}
+			.post-project:hover,
+			.post-project:focus-visible {
+				text-decoration: underline;
 			}
 		</style>
 	</head>
@@ -60,9 +172,11 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<Header />
 		<main>
 			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
-				</div>
+				{heroImage && (
+					<div class="hero-image">
+						<Image width={1020} height={510} src={heroImage} alt="" />
+					</div>
+				)}
 				<div class="prose">
 					<div class="title">
 						<div class="date">
@@ -74,6 +188,24 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 							)}
 						</div>
 						<h1>{title}</h1>
+						{(tags.length > 0 || project) && (
+							<ul class="post-tags" aria-label="Post tags">
+								{tags.map((tag) => (
+									<li class="post-tag">#{tag.trim().replace(/\s+/g, '-')}</li>
+								))}
+								{project && (
+									<li>
+										<a
+											class="post-project"
+											href={`/projects/${project}/`}
+											style={projectColor ? `--project-color: ${projectColor};` : undefined}
+										>
+											#{project}
+										</a>
+									</li>
+								)}
+							</ul>
+						)}
 						<HanaDivider compact />
 					</div>
 					<slot />
