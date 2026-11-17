@@ -1,10 +1,22 @@
 ---
 import { Image } from 'astro:assets';
-import mediaPlaceholder1 from '../assets/blog-placeholder-1.jpg';
-import mediaPlaceholder2 from '../assets/blog-placeholder-2.jpg';
-import mediaPlaceholder3 from '../assets/blog-placeholder-3.jpg';
-import mediaPlaceholder4 from '../assets/blog-placeholder-4.jpg';
-import mediaPlaceholder5 from '../assets/blog-placeholder-5.jpg';
+import type { ImageMetadata } from 'astro';
+import mediaPlaceholder1 from '../assets/media/ef.jpg';
+import mediaPlaceholder2 from '../assets/media/sg.jpg';
+import mediaPlaceholder3 from '../assets/media/rgd.jpg';
+import mediaPlaceholder4 from '../assets/media/umineko.jpg';
+import mediaPlaceholder5 from '../assets/media/cote.webp';
+import continueCursorSprite from '../assets/icons/cursor1.bmp?url';
+import typingCursorSprite from '../assets/icons/cursor0.bmp?url';
+import soulGardenIcon from '../assets/icons/soul-garden.png';
+import springPoemsIcon from '../assets/icons/spring-poems.png';
+import tomoyoIcon from '../assets/icons/tomoyo.png';
+import interestJapanese from '../assets/interests/japanese.png';
+import interestLinux from '../assets/interests/programming.webp';
+import interestMahjong from '../assets/interests/mahjong.jpg';
+import interestProgramming from '../assets/interests/linux.gif';
+import interestVisualNovels from '../assets/interests/visual-novels.png';
+import interestWriting from '../assets/interests/writing.gif';
 import pfp from '../assets/pfp.jpg';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
@@ -13,11 +25,39 @@ import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
 
 const favoriteMedia = [
-	{ title: 'Title placeholder 1', type: 'Media type', cover: mediaPlaceholder1 },
-	{ title: 'Title placeholder 2', type: 'Media type', cover: mediaPlaceholder2 },
-	{ title: 'Title placeholder 3', type: 'Media type', cover: mediaPlaceholder3 },
-	{ title: 'Title placeholder 4', type: 'Media type', cover: mediaPlaceholder4 },
-	{ title: 'Title placeholder 5', type: 'Media type', cover: mediaPlaceholder5 },
+	{ title: 'ef - a fairy tale of the two', type: 'Visual Novel', cover: mediaPlaceholder1 },
+	{ title: 'STEINS;GATE', type: 'Visual Novel', cover: mediaPlaceholder2 },
+	{ title: 'Rose Guns Days', type: 'Visual Novel', cover: mediaPlaceholder3 },
+	{ title: 'Umineko no Naku Koro ni', type: 'Visual Novel', cover: mediaPlaceholder4 },
+	{ title: 'Classroom of the Elite', type: 'Light Novel', cover: mediaPlaceholder5 },
+];
+
+type BioToken =
+	| { type: 'text'; value: string }
+	| { type: 'link'; href: string; label: string; icon: ImageMetadata };
+
+const bioText = (value: string): BioToken => ({ type: 'text', value });
+const bioLink = (href: string, label: string, icon: ImageMetadata): BioToken => ({
+	type: 'link',
+	href,
+	label,
+	icon,
+});
+
+// Edit the bio here. The ghost, live targets, and screen-reader sources are
+// generated from this list, so the copies can't drift apart.
+const bioParagraphs: BioToken[][] = [
+	[bioText("Hi, I am Dai, a writer and developer from Poland, currently studying computer science.")],
+	[
+		bioText(
+			'My biggest dream is to bring my original series, Hoshi no Keikyo (星の携挙), to life. It will span multiple entries, from visual novels like ',
+		),
+		bioLink('/projects/spring-poems/', 'Spring Poems', springPoemsIcon),
+		bioText(' to light novels like '),
+		bioLink('/projects/soul-garden/', 'Soul Garden', soulGardenIcon),
+		bioText('.'),
+	],
+	[bioText("I love a wide range of series, including When They Cry, SciAdv, Persona, Re:Zero, and Death Note, to name just a few.")],
 ];
 ---
 
@@ -32,30 +72,89 @@ const favoriteMedia = [
 	<body>
 		<Header />
 		<main class="about-page">
-			<header class="page-intro">
-				<span class="section-kicker" lang="ja">自己紹介</span>
-				<h1>46<span>dai</span></h1>
-			</header>
+			<section class="about-intro" aria-labelledby="about-heading">
+				<div class="about-side">
+					<figure class="about-portrait">
+						<Image src={pfp} alt="daishi's profile picture" width={360} height={360} />
+						<figcaption>
+							pfp source <a href="https://x.com/nngw_000" target="_blank" rel="noreferrer">@nngw_000</a>
+						</figcaption>
+					</figure>
 
-			<section class="about-intro" aria-label="About daishi">
-				<figure class="about-portrait">
-					<Image src={pfp} alt="daishi's profile picture" width={360} height={360} />
-					<figcaption>
-						pfp source <a href="https://x.com/nngw_000" target="_blank" rel="noreferrer">@nngw_000</a>
-					</figcaption>
-				</figure>
+					<nav class="profile-links" aria-label="Media profiles">
+						<a href="https://vndb.org/u325493" target="_blank" rel="noreferrer">
+							<span class="profile-link-icon" aria-hidden="true">{'\u{f05da}'}</span>
+							VNDB
+						</a>
+						<a href="https://anilist.co/user/46dai/" target="_blank" rel="noreferrer">
+							<span class="profile-link-icon" aria-hidden="true">{'\u{f02d5}'}</span>
+							AniList
+						</a>
+						<a href="https://steamcommunity.com/id/46dai/" target="_blank" rel="noreferrer">
+							<span class="profile-link-icon" aria-hidden="true">{'\u{f1b6}'}</span>
+							Steam
+						</a>
+					</nav>
+				</div>
 
 				<div class="about-copy">
-					<p class="about-lead">
-						I like to write and read VNs, study 日本語, and code fun apps on the side. Also a big
-						enthusiast of riichi mahjong and tinkering with Linux
-					</p>
+					<header class="about-heading">
+						<span class="section-kicker" lang="ja">自己紹介</span>
+						<h1 id="about-heading">46<span>dai</span></h1>
+					</header>
+					<div class="about-bio" data-typewriter>
+						<div class="about-bio-ghost" aria-hidden="true">
+							{bioParagraphs.map((tokens, index) => (
+								<p class="about-lead">
+									{tokens.map((token) =>
+										token.type === 'text' ? (
+											token.value
+										) : (
+											<a href={token.href} class="link-with-icon"><Image class="link-icon" src={token.icon} alt="" width={48} height={48} />{token.label}</a>
+										)
+									)}
+									{index === bioParagraphs.length - 1 && <span class="about-bio-cursor-space"></span>}
+								</p>
+							))}
+						</div>
+						<div class="about-bio-live">
+							{bioParagraphs.map((_, index) => (
+								<p class="about-lead">
+									<span aria-hidden="true" data-typewriter-target></span>
+									{index === bioParagraphs.length - 1 && (
+										<a
+											class="about-bio-cursor"
+											href="#interests"
+											aria-label="Continue to interests"
+											style={`--cursor-sprite: url(${continueCursorSprite})`}
+										></a>
+									)}
+								</p>
+							))}
+						</div>
+						<span
+							class="about-bio-type-cursor"
+							aria-hidden="true"
+							style={`--typing-cursor-sprite: url(${typingCursorSprite})`}
+						></span>
+						{bioParagraphs.map((tokens) => (
+							<span class="sr-only" data-typewriter-source>
+								{tokens.map((token) =>
+									token.type === 'text' ? (
+										token.value
+									) : (
+										<a href={token.href} class="link-with-icon" tabindex="-1"><Image class="link-icon" src={token.icon} alt="" width={48} height={48} />{token.label}</a>
+									)
+								)}
+							</span>
+						))}
+					</div>
 				</div>
 			</section>
 
 			<HanaDivider />
 
-			<section class="interests" aria-labelledby="interests-heading">
+			<section class="interests" id="interests" aria-labelledby="interests-heading">
 				<header class="section-heading">
 					<div>
 						<span class="section-kicker" lang="ja">趣味</span>
@@ -65,20 +164,58 @@ const favoriteMedia = [
 
 				<ul class="interest-grid">
 					<li>
-						<h3>Visual novels</h3>
-						<p>I enjoy visual novels as both a reader and a writer and have been reading them since 2020.</p>
+						<span class="interest-thumb" aria-hidden="true">
+							<Image src={interestVisualNovels} alt="" width={256} height={341} loading="lazy" />
+						</span>
+						<div class="interest-body">
+							<h3>visual novels</h3>
+							<p>I enjoy visual novels as both a reader and a writer and have been reading them since 2020.</p>
+						</div>
 					</li>
 					<li>
-						<h3>Japanese</h3>
-						<p>I'm studying 日本語 and working toward getting more comfortable with it.</p>
+						<span class="interest-thumb" aria-hidden="true">
+							<Image src={interestJapanese} alt="" width={256} height={341} loading="lazy" />
+						</span>
+						<div class="interest-body">
+							<h3>日本語</h3>
+							<p>I'm studying Japanese and working toward getting more comfortable with it, mainly through immersion via my app <a href="/projects/tomoyo/" class="link-with-icon"><Image class="link-icon" src={tomoyoIcon} alt="" width={48} height={48} />tomoyo</a>.</p>
+						</div>
 					</li>
 					<li>
-						<h3>Riichi mahjong</h3>
-						<p>Causes great damage to the human spirit without a single benefit.</p>
+						<span class="interest-thumb" aria-hidden="true">
+							<Image src={interestWriting} alt="" width={256} height={341} loading="lazy" />
+						</span>
+						<div class="interest-body">
+							<h3>writing</h3>
+							<p>I write both fiction and non-fiction, with a particular focus on visual novels.</p>
+						</div>
 					</li>
 					<li>
-						<h3>Linux &amp; app development</h3>
-						<p>I like tinkering with Linux and building useful or just-for-fun software.</p>
+						<span class="interest-thumb" aria-hidden="true">
+							<Image src={interestProgramming} alt="" width={256} height={341} loading="lazy" />
+						</span>
+						<div class="interest-body">
+							<h3>programming &amp; app development</h3>
+							<p>In my free time I build apps and tools, and I also program for VNs in ONScripter.</p>
+						</div>
+					</li>
+					<li>
+						<span class="interest-thumb" aria-hidden="true">
+							<Image src={interestMahjong} alt="" width={256} height={341} loading="lazy" />
+						</span>
+						<div class="interest-body">
+							<h3>riichi mahjong</h3>
+							<p>I started playing in April 2025 and peaked at Master 2 on MJS. Feel free to add me: 141399271!</p>
+						</div>
+					</li>
+					<li>
+						<span class="interest-thumb" aria-hidden="true">
+							<Image src={interestLinux} alt="" width={256} height={341} loading="lazy" />
+						</span>
+						<div class="interest-body">
+							<h3>linux</h3>
+							<p>I like tinkering with Linux and have been daily driving it for more than a year.</p>
+						</div>
 					</li>
 				</ul>
 			</section>
@@ -115,26 +252,31 @@ const favoriteMedia = [
 		max-width: 932px;
 	}
 
-	.page-intro {
-		margin-bottom: 1.5rem;
+	.about-heading {
+		margin-bottom: 0.75rem;
+		font-family: var(--font-mono);
 	}
 
-	.page-intro h1 {
-		margin: 0.05rem 0 0;
+	.about-heading h1 {
+		margin: 0;
 		font-size: clamp(2.5rem, 6vw, 3.5rem);
 		line-height: 1;
 		letter-spacing: -0.07em;
 	}
 
-	.page-intro h1 span {
+	.about-heading h1 span {
 		color: hsl(var(--primary));
 	}
 
 	.about-intro {
 		display: grid;
-		grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
-		align-items: center;
+		grid-template-columns: clamp(7.5rem, 16vw, 11rem) minmax(0, 1fr);
+		align-items: start;
 		gap: 2rem;
+	}
+
+	.about-side {
+		min-width: 0;
 	}
 
 	.about-portrait {
@@ -194,9 +336,146 @@ const favoriteMedia = [
 	.about-copy .about-lead {
 		margin-bottom: 0.5rem;
 		color: hsl(var(--foreground));
-		font-size: 1.35rem;
-		font-weight: 700;
-		line-height: 1.4;
+		font-size: 1.12rem;
+		font-weight: 400;
+		line-height: 1.65;
+	}
+
+	:global(:root[data-theme='dark']) .about-copy .about-lead {
+		color: #fff;
+	}
+
+	.about-bio {
+		position: relative;
+		max-width: 36rem;
+	}
+
+	:global(html.js) .about-bio-ghost {
+		visibility: hidden;
+	}
+
+	.about-bio-cursor-space {
+		display: inline-block;
+		width: calc(21px + 0.4rem);
+		height: 1px;
+	}
+
+	.about-bio-live {
+		display: none;
+	}
+
+	:global(html.js) .about-bio-live {
+		position: absolute;
+		inset: 0;
+		display: block;
+	}
+
+	.about-bio-type-cursor {
+		position: absolute;
+		z-index: 1;
+		display: none;
+		width: 16px;
+		height: 16px;
+		margin-left: 0.3rem;
+		background-image: var(--typing-cursor-sprite);
+		background-repeat: no-repeat;
+		background-position: 0 0;
+		background-size: 64px 16px;
+		image-rendering: pixelated;
+		pointer-events: none;
+		animation: about-typing-cursor-frames 0.7s steps(4) infinite;
+	}
+
+	.about-bio-type-cursor.is-visible {
+		display: block;
+	}
+
+	.about-bio-cursor {
+		display: none;
+		width: 21px;
+		height: 18px;
+		margin-left: 0.4rem;
+		vertical-align: -0.18em;
+		background-image: var(--cursor-sprite);
+		background-repeat: no-repeat;
+		background-position: 0 0;
+		background-size: 84px 18px;
+		image-rendering: pixelated;
+		text-decoration: none;
+		animation: about-cursor-frames 0.7s steps(4) infinite;
+	}
+
+	:global(html.js) .about-bio.is-complete .about-bio-cursor {
+		display: inline-block;
+	}
+
+	.about-page :global(.link-icon) {
+		display: inline-block;
+		width: 1.15em;
+		height: 1.15em;
+		margin-right: 0.32em;
+		border: 0;
+		border-radius: 0.22em;
+		object-fit: cover;
+		vertical-align: -0.2em;
+	}
+
+	.about-page :global(.link-with-icon) {
+		white-space: nowrap;
+	}
+
+	@keyframes about-typing-cursor-frames {
+		to {
+			background-position-x: -64px;
+		}
+	}
+
+	@keyframes about-cursor-frames {
+		to {
+			background-position-x: -84px;
+		}
+	}
+
+	.interests {
+		scroll-margin-top: 4.5rem;
+	}
+
+	.profile-links {
+		display: grid;
+		gap: 0.4rem;
+		margin-top: 0.75rem;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 600;
+	}
+
+	.profile-links a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		padding: 0.4rem 0.75rem;
+		border: 1px solid hsl(var(--border));
+		border-radius: 0.35rem;
+		background: hsl(var(--card));
+		color: hsl(var(--foreground));
+		text-decoration: none;
+		transition:
+			border-color 0.16s ease,
+			color 0.16s ease;
+	}
+
+	.profile-links a:hover,
+	.profile-links a:focus-visible {
+		border-color: hsl(var(--primary) / 0.6);
+		color: hsl(var(--primary));
+	}
+
+	.profile-link-icon {
+		display: inline-flex;
+		font-family: var(--font-symbols);
+		font-size: 0.95rem;
+		line-height: 1;
 	}
 
 	.about-socials {
@@ -228,10 +507,38 @@ const favoriteMedia = [
 	}
 
 	.interest-grid li {
-		padding: 1rem 1.1rem;
+		display: grid;
+		grid-template-columns: clamp(6.5rem, 24%, 8rem) minmax(0, 1fr);
+		align-items: stretch;
+		overflow: hidden;
 		border: 1px solid hsl(var(--border));
 		border-radius: 0.75rem;
 		background: hsl(var(--card));
+	}
+
+	.interest-thumb {
+		position: relative;
+		display: block;
+		width: 100%;
+		height: 100%;
+		min-height: 7rem;
+		background: hsl(var(--muted));
+	}
+
+	.interest-thumb :global(img) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		border: 0;
+		object-fit: cover;
+	}
+
+	.interest-body {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding: 1rem 1.1rem;
 	}
 
 	.interest-grid h3 {
@@ -300,18 +607,28 @@ const favoriteMedia = [
 		}
 	}
 
+	@media (max-width: 719px) {
+		.interests {
+			scroll-margin-top: 7rem;
+		}
+	}
+
 	@media (max-width: 620px) {
 		.about-intro {
 			grid-template-columns: minmax(0, 1fr);
 			gap: 1.25rem;
 		}
 
-		.about-portrait {
-			width: min(100%, 220px);
+		.about-side {
+			width: min(100%, 11rem);
 		}
 
 		.interest-grid {
 			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.interest-grid li {
+			grid-template-columns: 6rem minmax(0, 1fr);
 		}
 	}
 
@@ -325,5 +642,196 @@ const favoriteMedia = [
 		.about-portrait figcaption {
 			transition: none;
 		}
+
+		.about-bio-type-cursor,
+		.about-bio-cursor {
+			animation: none;
+		}
 	}
 </style>
+
+<script>
+	const bio = document.querySelector<HTMLElement>('[data-typewriter]');
+	const targets = bio
+		? [...bio.querySelectorAll<HTMLElement>('[data-typewriter-target]')]
+		: [];
+	const sources = bio
+		? [...bio.querySelectorAll<HTMLElement>('[data-typewriter-source]')]
+		: [];
+	const typingCursor = bio?.querySelector<HTMLElement>('.about-bio-type-cursor') ?? null;
+
+	if (bio && targets.length > 0 && targets.length === sources.length) {
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		type TypewriterStep =
+			| { type: 'attach'; node: Node; parent: Node }
+			| { type: 'char'; node: Text; char: string };
+
+		const buildParagraph = (source: HTMLElement, target: HTMLElement) => {
+			const steps: TypewriterStep[] = [];
+			let lastWasSpace = true;
+
+			const walk = (sourceNode: Node, parentNode: Node) => {
+				sourceNode.childNodes.forEach((child) => {
+					if (child.nodeType === Node.TEXT_NODE) {
+						const text = document.createTextNode('');
+						steps.push({ type: 'attach', node: text, parent: parentNode });
+
+						for (const char of Array.from((child.textContent ?? '').replace(/\s+/g, ' '))) {
+							if (char === ' ') {
+								if (lastWasSpace) continue;
+								lastWasSpace = true;
+							} else {
+								lastWasSpace = false;
+							}
+
+							steps.push({ type: 'char', node: text, char });
+						}
+
+						return;
+					}
+
+					if (child.nodeType !== Node.ELEMENT_NODE) return;
+
+					const element = (child as Element).cloneNode(false) as Element;
+					steps.push({ type: 'attach', node: element, parent: parentNode });
+					walk(child, element);
+				});
+			};
+
+			walk(source, target);
+
+			while (steps.length > 0) {
+				const last = steps[steps.length - 1];
+
+				if (last.type === 'char' && last.char === ' ') {
+					steps.pop();
+				} else {
+					break;
+				}
+			}
+
+			return steps;
+		};
+
+		const paragraphs = sources.map((source, index) => buildParagraph(source, targets[index]));
+		let paragraphIndex = 0;
+		let stepIndex = 0;
+		let lastCharRect: DOMRect | null = null;
+
+		const charRect = (node: Text, offset: number) => {
+			const range = document.createRange();
+			range.setStart(node, offset);
+			range.setEnd(node, offset + 1);
+
+			const rects = Array.from(range.getClientRects());
+			return rects.find((rect) => rect.height > 0) ?? null;
+		};
+
+		const showTypingCursor = (rect: DOMRect) => {
+			if (!typingCursor) return;
+
+			const bioRect = bio.getBoundingClientRect();
+			const cursorWidth = 16;
+			const maxLeft = Math.max(0, bio.clientWidth - cursorWidth);
+
+			typingCursor.style.left = `${Math.min(rect.right - bioRect.left, maxLeft)}px`;
+			typingCursor.style.top = `${rect.top - bioRect.top + (rect.height - 16) / 2}px`;
+			typingCursor.classList.add('is-visible');
+		};
+
+		const hideTypingCursor = () => {
+			typingCursor?.classList.remove('is-visible');
+		};
+
+		const complete = () => {
+			hideTypingCursor();
+			bio.classList.add('is-complete');
+
+			bio.querySelectorAll('[data-typewriter-target]').forEach((target) => {
+				target.removeAttribute('aria-hidden');
+			});
+			bio.querySelectorAll<HTMLAnchorElement>('.about-bio-live a[tabindex="-1"]').forEach((link) => {
+				link.removeAttribute('tabindex');
+			});
+			sources.forEach((source) => {
+				source.hidden = true;
+			});
+		};
+
+		const typeNext = () => {
+			const paragraph = paragraphs[paragraphIndex];
+
+			if (!paragraph) {
+				complete();
+				return;
+			}
+
+			if (stepIndex >= paragraph.length) {
+				const nextParagraph = paragraphIndex + 1;
+
+				if (nextParagraph >= paragraphs.length) {
+					complete();
+					return;
+				}
+
+				const resume = () => {
+					hideTypingCursor();
+					paragraphIndex = nextParagraph;
+					stepIndex = 0;
+					lastCharRect = null;
+					typeNext();
+				};
+
+				if (lastCharRect) {
+					showTypingCursor(lastCharRect);
+					window.setTimeout(resume, 1000);
+				} else {
+					resume();
+				}
+
+				return;
+			}
+
+			const step = paragraph[stepIndex++];
+
+			if (step.type === 'attach') {
+				step.parent.appendChild(step.node);
+				window.setTimeout(typeNext, 14);
+				return;
+			}
+
+			step.node.appendData(step.char);
+
+			const offset = step.node.length - 1;
+			const rect = charRect(step.node, offset);
+
+			if (rect) lastCharRect = rect;
+
+			window.setTimeout(typeNext, 14);
+		};
+
+		const start = () => {
+			if (reducedMotion) {
+				paragraphs.forEach((paragraph) => {
+					paragraph.forEach((step) => {
+						if (step.type === 'attach') {
+							step.parent.appendChild(step.node);
+						} else {
+							step.node.appendData(step.char);
+						}
+					});
+				});
+				complete();
+			} else {
+				window.setTimeout(typeNext, 180);
+			}
+		};
+
+		if (document.fonts?.ready) {
+			document.fonts.ready.then(start);
+		} else {
+			start();
+		}
+	}
+</script>

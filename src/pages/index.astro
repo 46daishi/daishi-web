@@ -599,6 +599,10 @@ const featuredProjects = projects
 		--log-accent: hsl(var(--primary));
 	}
 
+	:global(:root[data-theme='dark']) .site-log {
+		--log-bg: color-mix(in srgb, hsl(var(--card)) 30%, hsl(var(--background)));
+	}
+
 	.latest-posts ul,
 	.log-list {
 		display: flex;
