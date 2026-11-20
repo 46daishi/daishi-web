@@ -55,7 +55,6 @@ const bioParagraphs: BioToken[][] = [
 		bioLink('/projects/spring-poems/', 'Spring Poems', springPoemsIcon),
 		bioText(' to light novels like '),
 		bioLink('/projects/soul-garden/', 'Soul Garden', soulGardenIcon),
-		bioText('.'),
 	],
 	[bioText("I love a wide range of series, including When They Cry, SciAdv, Persona, Re:Zero, and Death Note, to name just a few.")],
 ];
@@ -797,7 +796,7 @@ const bioParagraphs: BioToken[][] = [
 
 			if (step.type === 'attach') {
 				step.parent.appendChild(step.node);
-				window.setTimeout(typeNext, 14);
+				window.setTimeout(typeNext, 10);
 				return;
 			}
 
@@ -808,7 +807,7 @@ const bioParagraphs: BioToken[][] = [
 
 			if (rect) lastCharRect = rect;
 
-			window.setTimeout(typeNext, 14);
+			window.setTimeout(typeNext, 10);
 		};
 
 		const start = () => {

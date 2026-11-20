@@ -1,31 +1,61 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import HanaDivider from '../../components/HanaDivider.astro';
 import Header from '../../components/Header.astro';
-import PillLink from '../../components/PillLink.astro';
 import ProjectStatus from '../../components/ProjectStatus.astro';
 import { PROJECT_TYPE_LABELS, SITE_TITLE } from '../../consts';
 import { hexToHslTriplet } from '../lib/color';
 
 export async function getStaticPaths() {
-	const projects = await getCollection('projects');
+	const [projects, posts] = await Promise.all([getCollection('projects'), getCollection('blog')]);
 
 	return projects.map((project) => ({
 		params: { slug: project.id },
-		props: { project },
+		props: {
+			project,
+			recentPosts: posts
+				.filter((post) => post.data.project === project.id)
+				.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+				.slice(0, 4),
+		},
 	}));
 }
 
 type Props = {
 	project: CollectionEntry<'projects'>;
+	recentPosts: CollectionEntry<'blog'>[];
 };
 
-const { project } = Astro.props;
-const { title, description, icon, type, status, color } = project.data;
+const { project, recentPosts } = Astro.props;
+const {
+	title,
+	description,
+	icon,
+	textLogo,
+	textLogoXOffset,
+	textLogoYOffset,
+	textLogoScale,
+	banner,
+	bannerY,
+	type,
+	status,
+	version,
+	color,
+	links,
+} = project.data;
+const { Content } = await render(project);
 const projectColor = hexToHslTriplet(color);
+const projectHref = `/projects/${project.id}/`;
+const typeLabel = PROJECT_TYPE_LABELS[type];
+const associatedLinks = links.filter(
+	(link) => link.href !== projectHref && link.href !== projectHref.replace(/\/$/, ''),
+);
+const isExternal = (href: string) => /^https?:\/\//.test(href);
 ---
 
 <!doctype html>
@@ -34,38 +64,137 @@ const projectColor = hexToHslTriplet(color);
 	style={`--primary: ${projectColor}; --site-accent: ${projectColor}; --site-accent-foreground: var(--primary-foreground); --brand: ${projectColor}; --ring: ${projectColor};`}
 >
 	<head>
-		<BaseHead title={`${title} | ${SITE_TITLE}`} description={description} />
+		<BaseHead
+			title={`${title} | ${SITE_TITLE}`}
+			description={description}
+			image={banner}
+			favicon={icon}
+		/>
 	</head>
 	<body>
 		<Header projectName={title} />
 		<main>
 			<article class="project-page">
 				<nav class="project-navigation" aria-label="Project navigation">
-					<PillLink href="/projects/" icon="\uf060">
-						Projects
-					</PillLink>
-					<PillLink href="/" icon="\uf015">
-						Home
-					</PillLink>
+					<a href="/projects/">
+						<span class="navigation-icon" aria-hidden="true">{'\uf060'}</span>
+						<span class="navigation-label">projects</span>
+					</a>
+					<a href="/">
+						<span class="navigation-icon" aria-hidden="true">{'\uf015'}</span>
+						<span class="navigation-label">home</span>
+					</a>
 				</nav>
 
-				<header class="project-header">
-					<Image src={icon} alt="" width={128} height={128} />
-					<div>
-						<p class="project-meta">
-							<span>{PROJECT_TYPE_LABELS[type]}</span>
-							<span aria-hidden="true">·</span>
-							<ProjectStatus status={status} />
-						</p>
-						<h1>{title}</h1>
-					</div>
+				<header
+					class:list={['project-hero', { 'has-text-logo': Boolean(textLogo) }]}
+					style={`--banner-y: ${bannerY}%; --text-logo-x-offset: ${textLogoXOffset}%; --text-logo-y-offset: ${textLogoYOffset}%; --text-logo-scale: ${textLogoScale};`}
+				>
+					<Image
+						class="project-banner-image"
+						src={banner}
+						alt=""
+						width={1600}
+						loading="eager"
+					/>
+					{textLogo ? (
+						<div class="project-logo-stage">
+							<h1>
+								<Image class="project-text-logo" src={textLogo} alt={title} loading="eager" />
+							</h1>
+						</div>
+					) : (
+						<div class="project-hero-inner">
+							<div class="project-icon">
+								<Image src={icon} alt="" width={128} height={128} loading="eager" />
+							</div>
+							<div class="project-heading">
+								<h1>{title}</h1>
+								<p class="project-description">{description}</p>
+							</div>
+						</div>
+					)}
 				</header>
+				{textLogo && (
+					<div class="project-summary">
+						<div class="project-icon">
+							<Image src={icon} alt="" width={96} height={96} loading="eager" />
+						</div>
+						<p class="project-description">{description}</p>
+					</div>
+				)}
 
-				<p class="project-description">{description}</p>
+				<HanaDivider compact icon={icon} color={color} />
 
-				<hr />
+				<div class="project-layout">
+					<div class="project-content">
+						<Content />
+					</div>
 
-				<p class="placeholder">Full project page coming soon.</p>
+					<aside class="project-side" aria-label="Project information">
+						<section class="project-panel" aria-labelledby={`${project.id}-details`}>
+							<h2 class="panel-title" id={`${project.id}-details`}>details</h2>
+							<dl class="project-facts">
+								<div>
+									<dt>type</dt>
+									<dd>{typeLabel}</dd>
+								</div>
+								<div>
+									<dt>status</dt>
+									<dd><ProjectStatus status={status} /></dd>
+								</div>
+								{version && (
+									<div>
+										<dt>progress</dt>
+										<dd>{version}</dd>
+									</div>
+								)}
+							</dl>
+						</section>
+
+						{associatedLinks.length > 0 && (
+							<section class="project-panel" aria-labelledby={`${project.id}-links`}>
+								<h2 class="panel-title" id={`${project.id}-links`}>links</h2>
+								<ul class="project-link-list">
+									{associatedLinks.map((link) => (
+										<li>
+											<a
+												href={link.href}
+												target={isExternal(link.href) ? '_blank' : undefined}
+												rel={isExternal(link.href) ? 'noreferrer' : undefined}
+											>
+												{link.icon && (
+													<span class="project-link-icon" aria-hidden="true">
+														{link.icon}
+													</span>
+												)}
+												<span class="project-link-label">{link.label}</span>
+											</a>
+										</li>
+									))}
+								</ul>
+							</section>
+						)}
+
+						<section class="project-panel" aria-labelledby={`${project.id}-posts`}>
+							<h2 class="panel-title" id={`${project.id}-posts`}>related posts</h2>
+							{recentPosts.length > 0 ? (
+								<ul class="project-post-list">
+									{recentPosts.map((post) => (
+										<li>
+											<a href={`/blog/${post.id}/`}>
+												<span class="project-post-title">{post.data.title}</span>
+												<FormattedDate date={post.data.pubDate} format="ja" />
+											</a>
+										</li>
+									))}
+								</ul>
+							) : (
+								<p class="panel-empty">No posts for this project yet.</p>
+							)}
+						</section>
+					</aside>
+				</div>
 			</article>
 		</main>
 		<Footer />
@@ -73,52 +202,516 @@ const projectColor = hexToHslTriplet(color);
 </html>
 
 <style>
+	.project-page {
+		--project-ink: color-mix(in srgb, hsl(var(--primary)) 60%, hsl(var(--foreground)));
+		--project-divider-color: color-mix(in srgb, hsl(var(--primary)) 38%, hsl(var(--border)));
+	}
+
 	.project-navigation {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.55rem;
-		margin-bottom: 2rem;
+		gap: 0.3rem 1.25rem;
+		margin-bottom: 1.25rem;
+		font-family: var(--font-sazanami);
+		font-size: 0.8rem;
+		font-weight: 600;
 	}
 
-	.project-header {
-		display: flex;
+	.project-navigation a {
+		display: inline-flex;
 		align-items: center;
-		gap: 1.25rem;
+		gap: 0.4rem;
+		color: hsl(var(--foreground) / 0.76);
+		text-decoration: none;
+		transition: color 0.16s ease;
 	}
 
-	.project-header :global(img) {
-		flex: 0 0 64px;
-		width: 64px;
-		height: 64px;
+	.project-navigation a:hover,
+	.project-navigation a:focus-visible {
+		color: var(--project-ink);
+	}
+
+	.navigation-icon {
+		font-family: var(--font-symbols);
+		font-size: 0.95rem;
+		line-height: 1;
+	}
+
+	.navigation-label {
+		text-decoration: underline transparent;
+		text-underline-offset: 0.22rem;
+		transition: text-decoration-color 0.16s ease;
+	}
+
+	.project-navigation a:hover .navigation-label,
+	.project-navigation a:focus-visible .navigation-label {
+		text-decoration-color: currentColor;
+	}
+
+	.project-hero {
+		position: relative;
+		overflow: hidden;
+		margin-bottom: 1.5rem;
+		border: 1px solid var(--project-divider-color);
+		border-radius: 0.75rem;
+		background: hsl(var(--card));
+	}
+
+	.project-hero.has-text-logo {
+		margin-bottom: 0;
+	}
+
+	.project-hero::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(90deg, rgb(0 0 0 / 0.82), rgb(0 0 0 / 0.5) 55%, rgb(0 0 0 / 0.08)),
+			linear-gradient(0deg, rgb(0 0 0 / 0.5), transparent 60%);
+	}
+
+	.project-hero :global(.project-banner-image) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
 		border: 0;
+		object-fit: cover;
+		object-position: center var(--banner-y, 50%);
 	}
 
-	.project-meta {
+	.project-hero-inner {
+		position: relative;
+		z-index: 1;
 		display: flex;
-		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.35rem;
-		margin: 0 0 0.35rem;
-		color: hsl(var(--muted-foreground));
-		font-size: 0.65rem;
-		letter-spacing: 0.06em;
-		line-height: 1.4;
-		text-transform: uppercase;
+		gap: 1rem;
+		width: min(100%, 42rem);
+		padding: clamp(1.25rem, 3.5vw, 1.85rem);
+		color: #fff;
 	}
 
-	.project-header h1 {
+	.project-logo-stage {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		place-items: center start;
+		width: 100%;
+		padding: clamp(1.25rem, 3.5vw, 1.85rem);
+	}
+
+	.project-logo-stage h1 {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		width: 100%;
 		margin: 0;
 	}
 
+	.project-icon {
+		flex: 0 0 64px;
+		width: 64px;
+		height: 64px;
+		overflow: hidden;
+		border-radius: 0.75rem;
+	}
+
+	.project-icon :global(img) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+		object-fit: cover;
+	}
+
+	.project-heading {
+		min-width: 0;
+	}
+
+	.project-heading h1 {
+		margin: 0;
+		color: #fff;
+		font-size: clamp(1.85rem, 4.5vw, 2.5rem);
+		line-height: 1;
+		letter-spacing: -0.06em;
+	}
+
+	.project-logo-stage .project-text-logo {
+		display: block;
+		width: auto;
+		max-width: 95%;
+		height: 9rem;
+		max-height: 9rem;
+		border: 0;
+		object-fit: contain;
+		object-position: left center;
+		transform: translate(var(--text-logo-x-offset), var(--text-logo-y-offset))
+			scale(var(--text-logo-scale));
+		transform-origin: left center;
+	}
+
+	.project-summary {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+		margin: 0.85rem 0 1.5rem;
+	}
+
+	.project-summary .project-icon {
+		flex-basis: 48px;
+		width: 48px;
+		height: 48px;
+		border-radius: 0.6rem;
+	}
+
+	.project-summary .project-description {
+		margin: 0;
+		color: hsl(var(--foreground) / 0.82);
+	}
+
 	.project-description {
-		max-width: 62ch;
-		margin: 1.5rem 0 0;
+		max-width: 52ch;
+		margin: 0.45rem 0 0;
+		color: rgb(255 255 255 / 0.8);
+		font-family: var(--font-sazanami);
+		font-size: 0.98rem;
+		line-height: 1.55;
+		text-wrap: pretty;
+	}
+
+	.project-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 12rem;
+		align-items: start;
+		gap: 2.5rem;
+	}
+
+	.project-content {
+		min-width: 0;
+		color: hsl(var(--foreground) / 0.92);
+		font-family: var(--font-sazanami);
+		font-size: 1.0625rem;
+		line-height: 1.75;
+	}
+
+	.project-content > :global(p) {
+		margin: 0 0 1.1rem;
+	}
+
+	.project-content > :global(h2) {
+		margin: 2rem 0 0.75rem;
+		font-family: var(--font-mono);
+		font-size: 1.35rem;
+		letter-spacing: -0.02em;
+	}
+
+	.project-content > :global(h2:first-child) {
+		margin-top: 0;
+	}
+
+	.project-content > :global(h3) {
+		margin: 1.5rem 0 0.5rem;
+		font-family: var(--font-mono);
+		font-size: 1.125rem;
+		letter-spacing: -0.01em;
+	}
+
+	.project-content > :global(ul),
+	.project-content > :global(ol) {
+		margin: 0 0 1.1rem;
+		padding-left: 1.25rem;
+	}
+
+	.project-content > :global(li + li) {
+		margin-top: 0.25rem;
+	}
+
+	.project-content > :global(blockquote) {
+		margin: 1.25rem 0;
+		padding: 0.55rem 0.85rem;
+		border-left: 2px solid hsl(var(--primary));
+		border-radius: 0 2px 2px 0;
+		background: hsl(var(--muted) / 0.5);
 		color: hsl(var(--muted-foreground));
 	}
 
-	.placeholder {
-		color: hsl(var(--muted-foreground));
+	.project-content > :global(blockquote p:last-child) {
+		margin-bottom: 0;
+	}
+
+	.project-content > :global(hr) {
+		margin: 1.75rem 0;
+		border: 0;
+		border-top: 1px solid var(--project-divider-color);
+	}
+
+	.project-content :global(a) {
+		color: var(--project-ink);
+		text-decoration-color: hsl(var(--primary) / 0.35);
+		text-underline-offset: 0.2em;
+	}
+
+	.project-content :global(a:hover),
+	.project-content :global(a:focus-visible) {
+		text-decoration-color: currentColor;
+	}
+
+	.project-content :global(code) {
+		padding: 0.1em 0.35em;
+		border-radius: 3px;
+		background: hsl(var(--muted));
+		font-family: var(--font-mono);
+		font-size: 0.88em;
+	}
+
+	.project-content > :global(pre) {
+		overflow-x: auto;
+		margin: 1.25rem 0;
+		padding: 1rem;
+		border: 1px solid hsl(var(--border));
+		border-radius: 0.5rem;
+		background: hsl(var(--card));
+	}
+
+	.project-content :global(pre code) {
+		padding: 0;
+		background: none;
+	}
+
+	.project-content :global(img) {
+		max-width: 100%;
+		height: auto;
+		border-radius: 0.5rem;
+	}
+
+	.project-side {
+		position: sticky;
+		top: 5rem;
+		display: grid;
+		gap: 1.25rem;
+		min-width: 0;
+	}
+
+	.project-panel + .project-panel {
+		padding-top: 1.25rem;
+		border-top: 1px solid var(--project-divider-color);
+	}
+
+	.panel-title {
+		margin: 0 0 0.6rem;
+		color: hsl(var(--foreground) / 0.75);
+		font-family: var(--font-sazanami);
 		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0;
+		line-height: 1.4;
+		text-transform: none;
 	}
 
+	.project-facts {
+		display: grid;
+		gap: 0.4rem;
+		margin: 0;
+	}
+
+	.project-facts > div {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.project-facts dt {
+		color: hsl(var(--muted-foreground));
+		font-family: var(--font-sazanami);
+		font-size: 0.75rem;
+		font-weight: 500;
+		letter-spacing: 0;
+		line-height: 1.5;
+		text-transform: none;
+	}
+
+	.project-facts dd {
+		margin: 0;
+		color: hsl(var(--foreground) / 0.9);
+		font-size: 0.78rem;
+		font-weight: 600;
+		line-height: 1.5;
+		text-align: right;
+	}
+
+	.project-facts :global(.project-status) {
+		font-size: inherit;
+		line-height: inherit;
+		vertical-align: top;
+	}
+
+	.project-link-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1.1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.project-link-list a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: hsl(var(--primary));
+		font-family: var(--font-sazanami);
+		font-size: 0.8rem;
+		font-weight: 600;
+		line-height: 1.5;
+		text-decoration: none;
+	}
+
+	.project-link-icon {
+		display: inline-flex;
+		font-family: var(--font-symbols);
+		font-size: 0.95rem;
+		line-height: 1;
+	}
+
+	.project-link-label {
+		text-decoration: underline transparent;
+		text-underline-offset: 0.22rem;
+		transition: text-decoration-color 0.16s ease;
+	}
+
+	.project-link-list a:hover .project-link-label,
+	.project-link-list a:focus-visible .project-link-label {
+		text-decoration-color: currentColor;
+	}
+
+	.project-post-list {
+		display: grid;
+		gap: 0.9rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.project-post-list a {
+		display: grid;
+		gap: 0.22rem;
+		color: hsl(var(--foreground) / 0.76);
+		text-decoration: none;
+	}
+
+	.project-post-list :global(time) {
+		display: block;
+		color: hsl(var(--foreground) / 0.68);
+		font-size: 0.72rem;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.01em;
+		line-height: 1.5;
+	}
+
+	.project-post-title {
+		font-family: var(--font-sazanami);
+		font-size: 0.88rem;
+		font-weight: 700;
+		line-height: 1.4;
+		transition: color 0.16s ease;
+	}
+
+	.project-post-list a:hover .project-post-title,
+	.project-post-list a:focus-visible .project-post-title {
+		color: var(--project-ink);
+	}
+
+	.panel-empty {
+		margin: 0;
+		color: hsl(var(--muted-foreground));
+		font-family: var(--font-sazanami);
+		font-size: 0.8rem;
+		line-height: 1.6;
+	}
+
+	@media (max-width: 760px) {
+		.project-layout {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 1.75rem;
+		}
+
+		.project-side {
+			position: static;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1.5rem;
+		}
+
+		.project-panel + .project-panel {
+			padding-top: 0;
+			border-top: 0;
+		}
+
+		.project-panel:last-child:nth-child(odd) {
+			grid-column: 1 / -1;
+			padding-top: 1.25rem;
+			border-top: 1px solid var(--project-divider-color);
+		}
+	}
+
+	@media (max-width: 520px) {
+		.project-hero {
+			border-radius: 0.6rem;
+		}
+
+		.project-hero-inner {
+			align-items: flex-start;
+			gap: 0.75rem;
+			padding: 1.15rem;
+		}
+
+		.project-icon {
+			flex-basis: 48px;
+			width: 48px;
+			height: 48px;
+			border-radius: 0.55rem;
+		}
+
+		.project-heading h1 {
+			font-size: clamp(1.65rem, 7vw, 2.25rem);
+		}
+
+		.project-summary {
+			align-items: flex-start;
+			gap: 0.75rem;
+		}
+
+		.project-summary .project-icon {
+			flex-basis: 40px;
+			width: 40px;
+			height: 40px;
+		}
+
+		.project-logo-stage .project-text-logo {
+			height: 6rem;
+			max-height: 6rem;
+		}
+
+		.project-description {
+			font-size: 0.92rem;
+		}
+
+		.project-side {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.project-panel:last-child:nth-child(odd) {
+			grid-column: auto;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.project-navigation a,
+		.navigation-label,
+		.project-link-list a,
+		.project-link-label,
+		.project-post-title {
+			transition: none;
+		}
+	}
 </style>

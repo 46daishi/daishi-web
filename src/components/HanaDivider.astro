@@ -1,18 +1,29 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import hana from '../assets/46hana.png';
 
 interface Props {
 	compact?: boolean;
+	icon?: ImageMetadata;
+	color?: string;
 }
 
-const { compact = false } = Astro.props;
+const { compact = false, icon, color } = Astro.props;
 ---
 
-<div class:list={['hana-divider', { compact }]} aria-hidden="true">
+<div
+	class:list={['hana-divider', { compact }]}
+	style={
+		color
+			? `--divider-color: color-mix(in srgb, ${color} 38%, hsl(var(--border)));`
+			: undefined
+	}
+	aria-hidden="true"
+>
 	<span class="hana-line"></span>
 	<span class="hana-mark">
-		<Image class="hana-icon" src={hana} alt="" width={72} height={72} />
+		<Image class="hana-icon" src={icon ?? hana} alt="" width={72} height={72} />
 	</span>
 	<span class="hana-line"></span>
 </div>
@@ -32,8 +43,8 @@ const { compact = false } = Astro.props;
 		background: linear-gradient(
 			90deg,
 			transparent,
-			hsl(var(--border)) 18%,
-			hsl(var(--border)) 82%,
+			var(--divider-color, hsl(var(--border))) 18%,
+			var(--divider-color, hsl(var(--border))) 82%,
 			transparent
 		);
 	}
@@ -45,11 +56,11 @@ const { compact = false } = Astro.props;
 		width: 38px;
 		height: 38px;
 		background: hsl(var(--background));
-		border: 1px solid hsl(var(--border));
+		border: 1px solid var(--divider-color, hsl(var(--border)));
 		border-radius: 50%;
 		box-shadow:
 			0 0 0 3px hsl(var(--background)),
-			0 0 0 4px hsl(var(--border));
+			0 0 0 4px var(--divider-color, hsl(var(--border)));
 	}
 
 	.hana-icon {

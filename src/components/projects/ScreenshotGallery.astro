@@ -1,0 +1,720 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+/**
+ * Justified screenshot gallery for project pages.
+ *
+ * From a project folder (recommended):
+ *   <ScreenshotGallery project="my-project" />
+ *
+ * With explicit images (custom alt text or order):
+ *   import shot from '../../assets/projects/my-project/shot-1.png';
+ *   <ScreenshotGallery screenshots={[{ src: shot, alt: '...' }]} />
+ *
+ * Without images it renders `count` placeholder tiles (default 4).
+ *
+ * Rows are balanced from the real aspect ratios of the images, so any number
+ * of screenshots and any mix of landscape, square, or portrait images fills
+ * the available width. Very tall or very wide thumbnails are cropped slightly
+ * to keep rows readable; the lightbox always shows the uncropped original.
+ */
+interface Screenshot {
+	src: ImageMetadata;
+	alt: string;
+}
+
+interface Props {
+	screenshots?: Screenshot[];
+	/**
+	 * Name of a folder in `src/assets/projects/`. Every image inside it is
+	 * picked up automatically, in filename order.
+	 */
+	project?: string;
+	heading?: string;
+	count?: number;
+}
+
+const { screenshots = [], project, heading = 'screenshots', count = 4 } = Astro.props;
+
+// Vite needs a static glob pattern, so match every project folder and filter
+// by the requested project below. This keeps image optimization and real
+// aspect-ratio data without one named import per screenshot.
+const projectImages = import.meta.glob<ImageMetadata>(
+	'/src/assets/projects/**/*.{png,jpg,jpeg,webp,avif}',
+	{ eager: true, import: 'default' },
+);
+
+const altFromFilename = (path: string) => {
+	const filename = path.split('/').pop() ?? '';
+	const label = filename
+		.replace(/\.[^.]+$/, '')
+		.replace(/^\d+[-_]?/, '')
+		.replace(/[-_]+/g, ' ')
+		.trim();
+
+	if (!label) return 'Screenshot';
+	return label.charAt(0).toUpperCase() + label.slice(1);
+};
+
+const projectScreenshots: Screenshot[] = project
+	? Object.entries(projectImages)
+			.filter(([path]) => path.startsWith(`/src/assets/projects/${project}/`))
+			.sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+			.map(([path, src]) => ({ src, alt: altFromFilename(path) }))
+	: [];
+
+// An explicit `screenshots` prop still wins, which allows custom alt text or
+// a hand-picked subset/order when the folder convention is not enough.
+const galleryScreenshots = screenshots.length > 0 ? screenshots : projectScreenshots;
+const hasScreenshots = galleryScreenshots.length > 0;
+const placeholderCount = Math.min(Math.max(count, 1), 12);
+
+type GalleryItem = {
+	index: number;
+	src?: ImageMetadata;
+	alt: string;
+	isPlaceholder: boolean;
+	ratio: number;
+};
+
+// Keep extreme panoramas and phone screenshots from becoming slivers in a
+// row. The image itself is still shown uncropped in the lightbox.
+const clampRatio = (ratio: number) => {
+	if (!Number.isFinite(ratio) || ratio <= 0) return 16 / 9;
+	return Math.min(Math.max(ratio, 0.75), 2.5);
+};
+
+const items: GalleryItem[] = hasScreenshots
+	? galleryScreenshots.map((screenshot, index) => ({
+			index,
+			src: screenshot.src,
+			alt: screenshot.alt,
+			isPlaceholder: false,
+			ratio: clampRatio(screenshot.src.width / screenshot.src.height),
+		}))
+	: Array.from({ length: placeholderCount }, (_, index) => ({
+			index,
+			alt: `Screenshot placeholder ${index + 1}`,
+			isPlaceholder: true,
+			ratio: 16 / 9,
+		}));
+---
+
+<section class="screenshot-gallery" aria-label={heading} data-gallery>
+	<div class="gallery-grid" data-gallery-grid>
+		{items.map((item) => (
+			<figure
+				class="gallery-item"
+				style={`--ratio: ${item.ratio.toFixed(6)};`}
+				data-ratio={item.ratio.toFixed(6)}
+			>
+				{item.isPlaceholder ? (
+					<button
+						type="button"
+						class="gallery-trigger"
+						data-index={item.index}
+						data-placeholder="true"
+						aria-haspopup="dialog"
+						aria-label={`Enlarge screenshot placeholder ${item.index + 1}`}
+					>
+						<span class="gallery-frame placeholder-frame" aria-hidden="true">
+							<span class="placeholder-mark">{'\uf03e'}</span>
+						</span>
+					</button>
+				) : (
+					<button
+						type="button"
+						class="gallery-trigger"
+						data-index={item.index}
+						data-alt={item.alt}
+						data-full-src={item.src!.src}
+						aria-haspopup="dialog"
+						aria-label={`Enlarge screenshot: ${item.alt}`}
+					>
+						<span class="gallery-frame">
+							<Image
+								class="gallery-image"
+								src={item.src!}
+								alt={item.alt}
+								widths={[240, 360, 480, 668, 960]}
+								sizes="(max-width: 520px) 92vw, (max-width: 760px) 60vw, 668px"
+								loading="lazy"
+								decoding="async"
+							/>
+						</span>
+					</button>
+				)}
+			</figure>
+		))}
+	</div>
+
+	<dialog class="gallery-lightbox" aria-label={`${heading} viewer`}>
+		<div class="lightbox-stage">
+			{items.length > 1 && (
+				<>
+					<button type="button" class="lightbox-nav is-prev" aria-label="Previous screenshot">
+						<span aria-hidden="true">{'\uf060'}</span>
+					</button>
+					<button type="button" class="lightbox-nav is-next" aria-label="Next screenshot">
+						<span aria-hidden="true">{'\uf061'}</span>
+					</button>
+				</>
+			)}
+			<img class="lightbox-image" alt="" decoding="async" hidden />
+			<div class="lightbox-placeholder" hidden>
+				<span class="placeholder-mark" aria-hidden="true">{'\uf03e'}</span>
+			</div>
+			<span class="lightbox-counter" aria-live="polite"></span>
+			<button type="button" class="lightbox-close" aria-label="Close screenshot viewer">
+				<span aria-hidden="true">{'\uf00d'}</span>
+			</button>
+		</div>
+	</dialog>
+</section>
+
+<script>
+	type GalleryItem = {
+		element: HTMLElement;
+		ratio: number;
+	};
+
+	const clamp = (value: number, minimum: number, maximum: number) =>
+		Math.min(Math.max(value, minimum), maximum);
+
+	const computeRows = (items: GalleryItem[], containerWidth: number, gap: number) => {
+		if (items.length === 0) return [];
+
+		const targetRowHeight = clamp(containerWidth * 0.23, 96, 160);
+		const minimumRowHeight = targetRowHeight * 0.62;
+		const maximumRowHeight = targetRowHeight * 2.4;
+		const minimumItemWidth = clamp(containerWidth * 0.18, 96, 130);
+		const maximumItemsPerRow = 5;
+		const total = items.length;
+
+		const best = new Array<number>(total + 1).fill(Number.POSITIVE_INFINITY);
+		const choice = new Array<{ start: number; count: number } | null>(total + 1).fill(null);
+		best[0] = 0;
+
+		for (let end = 1; end <= total; end += 1) {
+			let ratioSum = 0;
+
+			for (let count = 1; count <= Math.min(maximumItemsPerRow, end); count += 1) {
+				ratioSum += items[end - count].ratio;
+				const height = (containerWidth - gap * (count - 1)) / ratioSum;
+				let cost = ((height - targetRowHeight) / targetRowHeight) ** 2;
+
+				if (height > maximumRowHeight) {
+					cost += ((height - maximumRowHeight) / targetRowHeight) ** 2 * 3;
+				}
+
+				if (height < minimumRowHeight) {
+					cost += ((minimumRowHeight - height) / targetRowHeight) ** 2 * 3;
+				}
+
+				// Avoid shrinking a tall screenshot into an unreadable sliver
+				// just because it is sitting beside a very wide one.
+				for (let index = 0; index < count; index += 1) {
+					const itemWidth = height * items[end - count + index].ratio;
+
+					if (itemWidth < minimumItemWidth) {
+						cost += ((minimumItemWidth - itemWidth) / minimumItemWidth) ** 2 * 4;
+					}
+				}
+
+				// Prefer to avoid a lone screenshot on the final row.
+				if (count === 1 && total > 1) {
+					cost += 0.6;
+				}
+
+				cost += 0.02;
+
+				const previous = best[end - count];
+				if (previous + cost < best[end]) {
+					best[end] = previous + cost;
+					choice[end] = { start: end - count, count };
+				}
+			}
+		}
+
+		const rows: GalleryItem[][] = [];
+		let end = total;
+
+		while (end > 0) {
+			const selected = choice[end];
+			if (!selected) break;
+			rows.unshift(items.slice(selected.start, end));
+			end = selected.start;
+		}
+
+		return rows;
+	};
+
+	const layoutGallery = (gallery: HTMLElement) => {
+		const grid = gallery.querySelector<HTMLElement>('[data-gallery-grid]');
+		if (!grid) return;
+
+		const items = Array.from(grid.querySelectorAll<HTMLElement>('.gallery-item')).map(
+			(element) => ({
+				element,
+				ratio: Number.parseFloat(element.dataset.ratio || '1.777778') || 16 / 9,
+			}),
+		);
+
+		const width = grid.clientWidth;
+		if (width <= 0 || items.length === 0) return;
+
+		const gap = Number.parseFloat(getComputedStyle(grid).columnGap) || 12;
+		const maximumDisplayHeight = clamp(width * 0.7, 320, 480);
+		const rows = computeRows(items, width, gap);
+
+		let top = 0;
+
+		for (const row of rows) {
+			const availableWidth = width - gap * (row.length - 1);
+			const ratioSum = row.reduce((sum, item) => sum + item.ratio, 0);
+			const naturalHeight = availableWidth / ratioSum;
+			const rowHeight = Math.min(naturalHeight, maximumDisplayHeight);
+			let left = 0;
+
+			for (const item of row) {
+				const itemWidth = availableWidth * (item.ratio / ratioSum);
+				item.element.style.width = `${itemWidth}px`;
+				item.element.style.height = `${rowHeight}px`;
+				item.element.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+				left += itemWidth + gap;
+			}
+
+			top += rowHeight + gap;
+		}
+
+		grid.style.height = `${Math.max(0, top - gap)}px`;
+		grid.classList.add('is-laid-out');
+	};
+
+	const initGalleryLayout = (gallery: HTMLElement) => {
+		let lastWidth = 0;
+		let frame = 0;
+
+		const schedule = () => {
+			if (frame) return;
+			frame = window.requestAnimationFrame(() => {
+				frame = 0;
+				layoutGallery(gallery);
+			});
+		};
+
+		schedule();
+
+		if ('ResizeObserver' in window) {
+			const observer = new ResizeObserver(() => {
+				const width = Math.round(gallery.getBoundingClientRect().width);
+				if (width === lastWidth) return;
+				lastWidth = width;
+				schedule();
+			});
+			observer.observe(gallery);
+		} else {
+			window.addEventListener('resize', schedule);
+		}
+	};
+
+	const initGalleryLightbox = (gallery: HTMLElement) => {
+		const dialog = gallery.querySelector<HTMLDialogElement>('.gallery-lightbox');
+		const triggers = Array.from(gallery.querySelectorAll<HTMLButtonElement>('.gallery-trigger'));
+
+		if (!dialog || triggers.length === 0) return;
+
+		const image = dialog.querySelector<HTMLImageElement>('.lightbox-image');
+		const placeholder = dialog.querySelector<HTMLElement>('.lightbox-placeholder');
+		const counter = dialog.querySelector<HTMLElement>('.lightbox-counter');
+		const previous = dialog.querySelector<HTMLButtonElement>('.lightbox-nav.is-prev');
+		const next = dialog.querySelector<HTMLButtonElement>('.lightbox-nav.is-next');
+		const close = dialog.querySelector<HTMLButtonElement>('.lightbox-close');
+		const stage = dialog.querySelector<HTMLElement>('.lightbox-stage');
+
+		if (!image || !placeholder || !counter) return;
+
+		let current = 0;
+
+		const render = () => {
+			const trigger = triggers[current];
+			const source = trigger.querySelector('img');
+			const isPlaceholder = trigger.dataset.placeholder === 'true';
+			const fullSource = trigger.dataset.fullSrc;
+
+			if (isPlaceholder || !source) {
+				image.hidden = true;
+				image.removeAttribute('src');
+				image.alt = '';
+				placeholder.hidden = false;
+			} else {
+				placeholder.hidden = true;
+				image.hidden = false;
+				image.src = fullSource || source.currentSrc || source.src;
+				image.alt = trigger.dataset.alt || source.alt;
+			}
+
+			counter.textContent = `${current + 1} / ${triggers.length}`;
+		};
+
+		const step = (direction: number) => {
+			current = (current + direction + triggers.length) % triggers.length;
+			render();
+		};
+
+		triggers.forEach((trigger, index) => {
+			trigger.addEventListener('click', () => {
+				current = index;
+				render();
+				dialog.showModal();
+				document.documentElement.style.overflow = 'hidden';
+			});
+		});
+
+		previous?.addEventListener('click', () => step(-1));
+		next?.addEventListener('click', () => step(1));
+		close?.addEventListener('click', () => dialog.close());
+
+		dialog.addEventListener('keydown', (event) => {
+			if (event.key === 'ArrowLeft') {
+				event.preventDefault();
+				step(-1);
+			} else if (event.key === 'ArrowRight') {
+				event.preventDefault();
+				step(1);
+			} else if (event.key === 'Home') {
+				event.preventDefault();
+				current = 0;
+				render();
+			} else if (event.key === 'End') {
+				event.preventDefault();
+				current = triggers.length - 1;
+				render();
+			}
+		});
+
+		if (stage) {
+			let pointerStartX = 0;
+			let pointerStartY = 0;
+			let pointerActive = false;
+			let ignoreClick = false;
+
+			stage.addEventListener('pointerdown', (event) => {
+				if (event.pointerType === 'mouse' && event.button !== 0) return;
+				if ((event.target as HTMLElement).closest('button')) return;
+				pointerStartX = event.clientX;
+				pointerStartY = event.clientY;
+				pointerActive = true;
+				ignoreClick = false;
+			});
+
+			stage.addEventListener('pointerup', (event) => {
+				if (!pointerActive) return;
+				pointerActive = false;
+
+				const deltaX = event.clientX - pointerStartX;
+				const deltaY = event.clientY - pointerStartY;
+
+				if (Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY)) {
+					step(deltaX > 0 ? -1 : 1);
+					ignoreClick = true;
+				}
+			});
+
+			stage.addEventListener('pointercancel', () => {
+				pointerActive = false;
+			});
+
+			stage.addEventListener('click', (event) => {
+				if (ignoreClick) {
+					ignoreClick = false;
+					return;
+				}
+
+				if (event.target === stage) dialog.close();
+			});
+		}
+
+		dialog.addEventListener('close', () => {
+			image.hidden = true;
+			image.removeAttribute('src');
+			image.alt = '';
+			placeholder.hidden = true;
+			document.documentElement.style.overflow = '';
+		});
+	};
+
+	document.querySelectorAll<HTMLElement>('.screenshot-gallery').forEach((gallery) => {
+		initGalleryLayout(gallery);
+		initGalleryLightbox(gallery);
+	});
+</script>
+
+<style>
+	.screenshot-gallery {
+		container-type: inline-size;
+		margin: 1.75rem 0;
+	}
+
+	.gallery-grid {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		gap: 0.375rem;
+	}
+
+	.gallery-grid::after {
+		content: '';
+		flex: 1 0 0;
+	}
+
+	.gallery-item {
+		flex-grow: calc(var(--ratio) * 100);
+		flex-shrink: 1;
+		flex-basis: calc(var(--ratio) * 11rem);
+		min-width: 0;
+		max-width: 100%;
+		margin: 0;
+	}
+
+	.gallery-grid.is-laid-out {
+		position: relative;
+		display: block;
+	}
+
+	.gallery-grid.is-laid-out::after {
+		display: none;
+	}
+
+	.gallery-grid.is-laid-out .gallery-item {
+		position: absolute;
+		top: 0;
+		left: 0;
+		margin: 0;
+		will-change: transform;
+	}
+
+	.gallery-trigger {
+		display: block;
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		text-align: inherit;
+		cursor: zoom-in;
+	}
+
+	.gallery-trigger:focus-visible {
+		outline: 2px solid hsl(var(--ring));
+		outline-offset: 2px;
+	}
+
+	.gallery-frame {
+		position: relative;
+		display: block;
+		width: 100%;
+		overflow: hidden;
+		aspect-ratio: var(--ratio);
+		max-height: 30rem;
+		border-radius: 0.25rem;
+		background: hsl(var(--muted) / 0.35);
+	}
+
+	.gallery-grid.is-laid-out .gallery-frame {
+		height: 100%;
+		aspect-ratio: auto;
+		max-height: none;
+	}
+
+	.gallery-image {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+		object-fit: cover;
+	}
+
+	.placeholder-frame {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		border-style: dashed;
+		background:
+			radial-gradient(circle at 50% 42%, hsl(var(--primary) / 0.08), transparent 68%),
+			hsl(var(--muted) / 0.25);
+		color: hsl(var(--primary));
+	}
+
+	.placeholder-mark {
+		font-family: var(--font-symbols);
+		font-size: 1.45rem;
+		line-height: 1;
+		opacity: 0.72;
+	}
+
+	.gallery-trigger:hover .placeholder-frame,
+	.gallery-trigger:focus-visible .placeholder-frame {
+		background:
+			radial-gradient(circle at 50% 42%, hsl(var(--primary) / 0.14), transparent 68%),
+			hsl(var(--muted) / 0.35);
+	}
+
+	.gallery-lightbox {
+		inset: 0;
+		width: 100%;
+		max-width: none;
+		height: 100%;
+		max-height: none;
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+		border: 0;
+		background: transparent;
+		color: #fff;
+	}
+
+	.gallery-lightbox::backdrop {
+		background: rgb(0 0 0 / 0.88);
+	}
+
+	.lightbox-stage {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		padding: clamp(1.25rem, 5vw, 3.5rem);
+		touch-action: pan-y;
+	}
+
+	.lightbox-counter {
+		position: absolute;
+		top: 0.9rem;
+		left: 1.1rem;
+		color: rgb(255 255 255 / 0.5);
+		font-family: var(--font-sazanami);
+		font-size: 0.72rem;
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.02em;
+	}
+
+	.lightbox-close,
+	.lightbox-nav {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.5rem;
+		border: 0;
+		background: transparent;
+		color: rgb(255 255 255 / 0.55);
+		font-family: var(--font-symbols);
+		line-height: 1;
+		cursor: pointer;
+		transition: color 0.16s ease;
+	}
+
+	.lightbox-close {
+		position: absolute;
+		top: 0.65rem;
+		right: 0.75rem;
+		font-size: 0.95rem;
+	}
+
+	.lightbox-nav {
+		position: absolute;
+		z-index: 1;
+		top: 50%;
+		font-size: 1.05rem;
+		transform: translateY(-50%);
+	}
+
+	.lightbox-nav.is-prev {
+		left: clamp(0.25rem, 2vw, 1.25rem);
+	}
+
+	.lightbox-nav.is-next {
+		right: clamp(0.25rem, 2vw, 1.25rem);
+	}
+
+	.lightbox-close:hover,
+	.lightbox-nav:hover {
+		color: #fff;
+	}
+
+	.lightbox-close:focus-visible,
+	.lightbox-nav:focus-visible {
+		outline: 1px solid rgb(255 255 255 / 0.6);
+		outline-offset: 2px;
+		color: #fff;
+	}
+
+	.lightbox-image {
+		width: auto;
+		max-width: 100%;
+		height: auto;
+		max-height: 100%;
+		border-radius: 0.125rem;
+		object-fit: contain;
+	}
+
+	.lightbox-image[hidden],
+	.lightbox-placeholder[hidden] {
+		display: none;
+	}
+
+	.lightbox-placeholder {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: min(100%, 50rem);
+		aspect-ratio: 16 / 9;
+		border: 1px dashed rgb(255 255 255 / 0.22);
+		border-radius: 0.125rem;
+		color: rgb(255 255 255 / 0.8);
+	}
+
+	.lightbox-placeholder .placeholder-mark {
+		font-size: 2rem;
+	}
+
+	@container (max-width: 420px) {
+		.gallery-grid:not(.is-laid-out) .gallery-item {
+			flex-basis: 100%;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.lightbox-stage {
+			padding: 0.65rem;
+		}
+
+		.lightbox-nav {
+			top: auto;
+			bottom: 0.65rem;
+			transform: none;
+		}
+
+		.lightbox-nav.is-prev {
+			left: 0.65rem;
+		}
+
+		.lightbox-nav.is-next {
+			right: 0.65rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.lightbox-close,
+		.lightbox-nav {
+			transition: none;
+		}
+	}
+</style>

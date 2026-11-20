@@ -72,9 +72,18 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 		transition: border-color 0.18s ease;
 	}
 
+	:global(:root[data-theme='dark']) .project {
+		--project-ink: var(--project-color);
+	}
+
 	.project:hover,
 	.project:focus-within {
 		border-color: color-mix(in srgb, var(--project-color) 32%, hsl(var(--border)));
+	}
+
+	:global(:root[data-theme='dark']) .project:hover,
+	:global(:root[data-theme='dark']) .project:focus-within {
+		border-color: var(--project-color);
 	}
 
 	.project-header {

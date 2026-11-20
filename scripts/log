@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_dir="${DAISHI_WEB_REPO:-$HOME/Projects/daishi-web}"
+log_dir="$repo_dir/src/content/log"
+
+if (($# == 0)); then
+	printf "Usage: log 'text here'\n" >&2
+	exit 2
+fi
+
+message="$*"
+if [[ -z "$message" ]]; then
+	printf 'Log text cannot be empty.\n' >&2
+	exit 2
+fi
+
+if [[ ! -d "$repo_dir/.git" ]]; then
+	printf 'Not a Git repository: %s\n' "$repo_dir" >&2
+	exit 1
+fi
+
+today=$(date +%F)
+filename="$today.md"
+suffix=2
+while [[ -e "$log_dir/$filename" ]]; do
+	filename="$today-$suffix.md"
+	((suffix += 1))
+done
+
+relative_path="src/content/log/$filename"
+printf '%s\n' '---' "date: $today" '---' '' "$message" > "$repo_dir/$relative_path"
+
+git -C "$repo_dir" add -- "$relative_path"
+git -C "$repo_dir" commit --only -m "Add log entry for $today" -- "$relative_path"
+git -C "$repo_dir" push origin HEAD
