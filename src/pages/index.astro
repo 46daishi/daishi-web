@@ -10,6 +10,7 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import HanaDivider from '../components/HanaDivider.astro';
 import Header from '../components/Header.astro';
+import ProfileFacts from '../components/ProfileFacts.astro';
 import SectionLink from '../components/SectionLink.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
@@ -91,6 +92,7 @@ const featuredProjects = projects
 							</svg>
 						</a>
 					</div>
+					<ProfileFacts />
 				</div>
 				<div class="intro-copy">
 					<span class="section-kicker" lang="ja">自己紹介</span>
@@ -106,9 +108,73 @@ const featuredProjects = projects
 						></a></span>
 						<span class="sr-only" data-typewriter-source>I like to write and read VNs, study 日本語, and code fun apps on the side. Also a big enthusiast of riichi mahjong and tinkering with Linux</span>
 					</p>
-					<blockquote class="intro-now">
-						<span class="now-label">status</span>: building the website, writing soul garden
-					</blockquote>
+					<section
+						class="intro-presence"
+						data-lanyard-presence
+						data-endpoint="https://api.lanyard.rest/v1/users/222405088986005504"
+						aria-label="Discord activity"
+					>
+						<div class="presence-art" data-presence-art hidden>
+							<span
+								class="presence-image-target"
+								data-presence-large-target
+								tabindex="0"
+								aria-describedby="presence-large-tooltip"
+							>
+								<img data-presence-image alt="" />
+								<span
+									class="presence-tooltip"
+									id="presence-large-tooltip"
+									data-presence-large-tooltip
+									role="tooltip"
+									hidden
+								></span>
+							</span>
+							<span class="presence-small-art" data-presence-small-art hidden>
+								<span
+									class="presence-image-target presence-image-target-small"
+									data-presence-small-target
+									tabindex="0"
+									aria-describedby="presence-small-tooltip"
+								>
+									<img data-presence-small-image alt="" />
+									<span
+										class="presence-tooltip"
+										id="presence-small-tooltip"
+										data-presence-small-tooltip
+										role="tooltip"
+										hidden
+									></span>
+								</span>
+							</span>
+						</div>
+						<div class="presence-placeholder" data-presence-placeholder aria-hidden="true">
+							<svg viewBox="0 0 24 24">
+								<path d="M7.5 8.5h9a4 4 0 0 1 3.8 2.8l1.1 3.5a2.5 2.5 0 0 1-3.8 2.8l-2.1-1.4H8.5l-2.1 1.4a2.5 2.5 0 0 1-3.8-2.8l1.1-3.5a4 4 0 0 1 3.8-2.8Z" />
+								<path d="M8 11v4m-2-2h4m6-1h.01M18 14h.01" />
+							</svg>
+						</div>
+						<div class="presence-copy" aria-live="polite" aria-atomic="true">
+							<div class="presence-heading">
+								<svg class="presence-discord-icon" viewBox="0 0 24 24" aria-hidden="true">
+									<path
+										fill="currentColor"
+										d="M20.317 4.3698a19.7913 19.7913 0 0 0-4.8851-1.5152.0741.0741 0 0 0-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 0 0-.0785-.037c-1.6791.3062-3.3009.8155-4.8852 1.515a.0699.0699 0 0 0-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 0 0 .0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 0 0 .0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 0 0-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 0 1-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 0 1 .0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 0 1 .0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 0 1-.0066.1276 12.2986 12.2986 0 0 1-1.873.8914.0766.0766 0 0 0-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 0 0 .0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 0 0 .0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 0 0-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"
+									></path>
+								</svg>
+								<span class="presence-provider">Discord</span>
+								<span class="presence-divider" aria-hidden="true">·</span>
+								<span class="presence-indicator" data-presence-indicator></span>
+								<span class="presence-status" data-presence-status>Checking Discord</span>
+								<span class="presence-divider" aria-hidden="true">·</span>
+								<span class="presence-kind" data-presence-kind>Rich presence</span>
+							</div>
+							<strong class="presence-name" data-presence-name>Loading activity…</strong>
+							<span class="presence-detail" data-presence-detail hidden></span>
+							<span class="presence-state" data-presence-state hidden></span>
+						</div>
+						<time class="presence-elapsed" data-presence-elapsed aria-label="Time elapsed" hidden></time>
+					</section>
 				</div>
 			</section>
 
@@ -400,33 +466,218 @@ const featuredProjects = projects
 		}
 	}
 
-	.intro-now {
-		margin: 0.85rem 0 0;
-		padding: 0.4rem 0.65rem;
-		border-left: 2px solid hsl(var(--primary));
-		border-radius: 0 var(--radius) var(--radius) 0;
-		background: hsl(var(--muted) / 0.55);
-		color: hsl(var(--muted-foreground));
-		font-size: 0.82rem;
-		line-height: 1.6;
+	.intro-presence {
+		display: flex;
+		align-items: center;
+		gap: 0.8rem;
+		max-width: 32rem;
+		min-height: 5.25rem;
+		margin-top: 0.9rem;
+		padding: 0.65rem;
+		border: 1px solid hsl(var(--border));
+		border-radius: 0.75rem;
+		background: hsl(var(--card));
+		color: hsl(var(--foreground));
 	}
 
-	.now-label {
-		color: hsl(var(--foreground) / 0.8);
+	.presence-art,
+	.presence-placeholder {
+		position: relative;
+		display: grid;
+		flex: 0 0 3.75rem;
+		width: 3.75rem;
+		height: 3.75rem;
+		overflow: hidden;
+		place-items: center;
+		border-radius: 0.55rem;
+		background: hsl(var(--muted));
+	}
+
+	.presence-art {
+		overflow: visible;
+		background: transparent;
+	}
+
+	.presence-art[hidden] {
+		display: none;
+	}
+
+	.presence-image-target {
+		position: absolute;
+		inset: 0;
+		display: block;
+		overflow: hidden;
+		border-radius: 0.55rem;
+		background: hsl(var(--muted));
+		outline-offset: 2px;
+	}
+
+	.presence-image-target img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.presence-small-art {
+		position: absolute;
+		z-index: 2;
+		right: 0.08rem;
+		bottom: 0.08rem;
+		width: 1.45rem;
+		height: 1.45rem;
+		overflow: visible;
+		border-radius: 50%;
+		background: hsl(var(--muted));
+	}
+
+	.presence-small-art[hidden] {
+		display: none;
+	}
+
+	.presence-image-target-small {
+		border: 2px solid hsl(var(--card));
+		border-radius: 50%;
+	}
+
+	.presence-tooltip {
+		position: absolute;
+		z-index: 4;
+		bottom: calc(100% + 0.4rem);
+		left: 50%;
+		width: max-content;
+		max-width: 13rem;
+		padding: 0.35rem 0.55rem;
+		transform: translateX(-50%);
+		border: 1px solid hsl(var(--border));
+		border-radius: 0.4rem;
+		background: hsl(var(--card));
+		color: hsl(var(--foreground));
+		box-shadow: 0 2px 6px hsl(var(--foreground) / 0.14);
+		font-family: var(--font-sazanami);
+		font-size: 0.68rem;
 		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
+		line-height: 1.35;
+		text-align: center;
+		white-space: normal;
+		pointer-events: none;
+		visibility: hidden;
+		opacity: 0;
+		transition: opacity 0.08s ease;
 	}
 
-	.intro-now a {
-		color: inherit;
-		text-decoration-color: hsl(var(--muted-foreground) / 0.5);
-		text-underline-offset: 0.15em;
+	.presence-tooltip[hidden] {
+		display: none;
 	}
 
-	.intro-now a:hover,
-	.intro-now a:focus-visible {
-		color: hsl(var(--primary));
+	.presence-image-target:hover .presence-tooltip:not([hidden]),
+	.presence-image-target:focus-visible .presence-tooltip:not([hidden]) {
+		visibility: visible;
+		opacity: 1;
+	}
+
+	.presence-placeholder[hidden] {
+		display: none;
+	}
+
+	.presence-placeholder svg {
+		width: 1.8rem;
+		fill: none;
+		stroke: hsl(var(--muted-foreground));
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 1.5;
+	}
+
+	.presence-copy {
+		display: grid;
+		min-width: 0;
+		gap: 0.12rem;
+		font-family: var(--font-sazanami);
+		line-height: 1.45;
+	}
+
+	.presence-heading {
+		display: flex;
+		align-items: center;
+		gap: 0.38rem;
+		min-width: 0;
+		color: hsl(var(--muted-foreground));
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.025em;
+	}
+
+	.presence-discord-icon {
+		width: 0.82rem;
+		height: 0.82rem;
+		flex: 0 0 auto;
+	}
+
+	.presence-provider,
+	.presence-status,
+	.presence-kind {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.presence-indicator {
+		width: 0.48rem;
+		height: 0.48rem;
+		flex: 0 0 auto;
+		border-radius: 50%;
+		background: hsl(var(--muted-foreground));
+	}
+
+	.presence-indicator[data-status='online'] {
+		background: #3ba55c;
+	}
+
+	.presence-indicator[data-status='idle'] {
+		background: #faa61a;
+	}
+
+	.presence-indicator[data-status='dnd'] {
+		background: #ed4245;
+	}
+
+	.presence-divider {
+		opacity: 0.65;
+	}
+
+	.presence-name,
+	.presence-detail,
+	.presence-state {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.presence-name {
+		font-size: 0.88rem;
+		font-weight: 700;
+	}
+
+	.presence-detail {
+		color: hsl(var(--foreground) / 0.8);
+		font-size: 0.75rem;
+	}
+
+	.presence-state {
+		color: hsl(var(--muted-foreground));
+		font-size: 0.72rem;
+	}
+
+	.presence-elapsed {
+		align-self: flex-end;
+		flex: 0 0 auto;
+		margin: 0 0 0.12rem auto;
+		color: hsl(var(--muted-foreground));
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		font-variant-numeric: tabular-nums;
+		line-height: 1;
 	}
 
 	.social-links {
@@ -877,7 +1128,8 @@ const featuredProjects = projects
 			font-size: 1.04rem;
 		}
 
-		.intro-now {
+		.intro-presence {
+			max-width: 100%;
 			font-size: 0.76rem;
 		}
 
@@ -962,5 +1214,253 @@ const featuredProjects = projects
 		} else {
 			window.setTimeout(typeNext, 180);
 		}
+	}
+</script>
+
+<script>
+	type LanyardActivity = {
+		name: string;
+		type: number;
+		application_id?: string;
+		details?: string | null;
+		state?: string | null;
+		created_at?: number;
+		timestamps?: {
+			start?: number;
+			end?: number;
+		};
+		assets?: {
+			large_image?: string | null;
+			large_text?: string | null;
+			small_image?: string | null;
+			small_text?: string | null;
+		};
+	};
+
+	type LanyardPresence = {
+		success: boolean;
+		data?: {
+			discord_status: string;
+			activities: LanyardActivity[];
+			listening_to_spotify: boolean;
+			spotify?: {
+				song: string;
+				artist: string;
+				album: string;
+				album_art_url: string;
+				timestamps?: {
+					start?: number;
+					end?: number;
+				};
+			} | null;
+		};
+	};
+
+	const presence = document.querySelector<HTMLElement>('[data-lanyard-presence]');
+
+	if (presence) {
+		const endpoint = presence.dataset.endpoint;
+		const indicator = presence.querySelector<HTMLElement>('[data-presence-indicator]');
+		const statusLabel = presence.querySelector<HTMLElement>('[data-presence-status]');
+		const kindLabel = presence.querySelector<HTMLElement>('[data-presence-kind]');
+		const nameLabel = presence.querySelector<HTMLElement>('[data-presence-name]');
+		const detailLabel = presence.querySelector<HTMLElement>('[data-presence-detail]');
+		const stateLabel = presence.querySelector<HTMLElement>('[data-presence-state]');
+		const art = presence.querySelector<HTMLElement>('[data-presence-art]');
+		const image = presence.querySelector<HTMLImageElement>('[data-presence-image]');
+		const placeholder = presence.querySelector<HTMLElement>('[data-presence-placeholder]');
+		const smallArt = presence.querySelector<HTMLElement>('[data-presence-small-art]');
+		const smallImage = presence.querySelector<HTMLImageElement>('[data-presence-small-image]');
+		const largeTarget = presence.querySelector<HTMLElement>('[data-presence-large-target]');
+		const smallTarget = presence.querySelector<HTMLElement>('[data-presence-small-target]');
+		const largeTooltip = presence.querySelector<HTMLElement>('[data-presence-large-tooltip]');
+		const smallTooltip = presence.querySelector<HTMLElement>('[data-presence-small-tooltip]');
+		const elapsed = presence.querySelector<HTMLTimeElement>('[data-presence-elapsed]');
+		let elapsedStartedAt: number | null = null;
+
+		const setOptionalText = (element: HTMLElement | null, value?: string | null) => {
+			if (!element) return;
+			element.textContent = value ?? '';
+			element.hidden = !value;
+		};
+
+		const setTooltip = (
+			tooltip: HTMLElement | null,
+			target: HTMLElement | null,
+			value?: string | null,
+		) => {
+			if (tooltip) {
+				tooltip.textContent = value ?? '';
+				tooltip.hidden = !value;
+			}
+			if (target) {
+				if (value) target.setAttribute('aria-label', value);
+				else target.removeAttribute('aria-label');
+			}
+		};
+
+		const getAssetUrl = (asset?: string | null, applicationId?: string) => {
+			if (!asset) return '';
+			if (/^https?:\/\//.test(asset)) return asset;
+			if (asset.startsWith('mp:external/')) {
+				return `https://media.discordapp.net/${asset.slice(3)}`;
+			}
+			return applicationId
+				? `https://cdn.discordapp.com/app-assets/${applicationId}/${asset}.png`
+				: '';
+		};
+
+		const updateElapsed = () => {
+			if (!elapsed) return;
+			if (elapsedStartedAt === null) {
+				elapsed.textContent = '';
+				elapsed.removeAttribute('datetime');
+				elapsed.hidden = true;
+				return;
+			}
+			const totalSeconds = Math.max(0, Math.floor((Date.now() - elapsedStartedAt) / 1000));
+			const hours = Math.floor(totalSeconds / 3600);
+			const minutes = Math.floor((totalSeconds % 3600) / 60);
+			const seconds = totalSeconds % 60;
+			elapsed.textContent =
+				hours > 0
+					? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+					: `${minutes}:${String(seconds).padStart(2, '0')}`;
+			elapsed.dateTime = `PT${totalSeconds}S`;
+			elapsed.hidden = false;
+		};
+
+		const renderPresence = (data: NonNullable<LanyardPresence['data']>) => {
+			const status = data.discord_status;
+			if (indicator) indicator.dataset.status = status;
+			if (statusLabel) {
+				statusLabel.textContent =
+					status === 'dnd'
+						? 'Do not disturb'
+						: status === 'idle'
+							? 'Idle'
+							: status === 'online'
+								? 'Online'
+								: 'Offline';
+			}
+
+			const spotify = data.listening_to_spotify ? data.spotify : null;
+			const activity =
+				data.activities.find((item) => item.type === 0 || item.type === 2 || item.type === 3 || item.type === 5) ??
+				null;
+			const spotifyActivity = data.activities.find((item) => item.name === 'Spotify');
+			const activeActivity = spotify ? spotifyActivity : activity;
+			const imageUrl =
+				(spotify ? spotify.album_art_url : '') ||
+				getAssetUrl(activeActivity?.assets?.large_image, activeActivity?.application_id);
+			const smallImageUrl = getAssetUrl(
+				activeActivity?.assets?.small_image,
+				activeActivity?.application_id,
+			);
+			setTooltip(
+				largeTooltip,
+				largeTarget,
+				imageUrl
+					? (activeActivity?.assets?.large_text ?? (spotify ? spotify.album : activeActivity?.name))
+					: '',
+			);
+			setTooltip(
+				smallTooltip,
+				smallTarget,
+				smallImageUrl
+					? (activeActivity?.assets?.small_text ?? activeActivity?.name)
+					: '',
+			);
+			elapsedStartedAt = spotify
+				? spotify.timestamps?.start ?? spotifyActivity?.created_at ?? null
+				: activity?.timestamps?.start ?? activity?.created_at ?? null;
+			updateElapsed();
+
+			if (spotify) {
+				if (kindLabel) kindLabel.textContent = 'Listening to Spotify';
+				if (nameLabel) nameLabel.textContent = spotify.song;
+				setOptionalText(detailLabel, `by ${spotify.artist}`);
+				setOptionalText(stateLabel, spotify.album);
+			} else if (activity) {
+				if (kindLabel) {
+					kindLabel.textContent =
+						activity.type === 3
+							? 'Watching'
+							: activity.type === 2
+								? 'Listening to'
+								: activity.type === 5
+									? 'Competing in'
+									: 'Playing';
+				}
+				if (nameLabel) nameLabel.textContent = activity.name;
+				setOptionalText(detailLabel, activity.details);
+				setOptionalText(stateLabel, activity.state);
+			} else {
+				if (kindLabel) kindLabel.textContent = 'Discord activity';
+				if (nameLabel) {
+					nameLabel.textContent =
+						status === 'offline' ? 'Not online right now' : 'Not playing anything right now';
+				}
+				setOptionalText(detailLabel);
+				setOptionalText(stateLabel);
+			}
+
+			if (image && art && placeholder) {
+				image.onerror = () => {
+					art.hidden = true;
+					placeholder.hidden = false;
+				};
+				if (imageUrl) {
+					image.src = imageUrl;
+					art.hidden = false;
+					placeholder.hidden = true;
+				} else {
+					image.removeAttribute('src');
+					art.hidden = true;
+					placeholder.hidden = false;
+				}
+			}
+
+			if (smallImage && smallArt) {
+				smallImage.onerror = () => {
+					smallArt.hidden = true;
+				};
+				if (smallImageUrl) {
+					smallImage.src = smallImageUrl;
+					smallArt.hidden = false;
+				} else {
+					smallImage.removeAttribute('src');
+					smallArt.hidden = true;
+				}
+			}
+		};
+
+		const updatePresence = async () => {
+			if (!endpoint) return;
+			try {
+				const response = await fetch(endpoint, { cache: 'no-store' });
+				if (!response.ok) throw new Error(`Lanyard returned HTTP ${response.status}`);
+				const result = (await response.json()) as LanyardPresence;
+				if (!result.success || !result.data) throw new Error('Lanyard returned no presence data');
+				renderPresence(result.data);
+			} catch (error) {
+				if (statusLabel) statusLabel.textContent = 'Discord status unavailable';
+				if (kindLabel) kindLabel.textContent = 'Retrying';
+				if (nameLabel) nameLabel.textContent = 'Could not load activity';
+				setOptionalText(detailLabel);
+				setOptionalText(stateLabel);
+				elapsedStartedAt = null;
+				if (elapsed) {
+					elapsed.textContent = '';
+					elapsed.removeAttribute('datetime');
+					elapsed.hidden = true;
+				}
+				console.error('Unable to fetch Discord presence from Lanyard.', error);
+			}
+		};
+
+		void updatePresence();
+		window.setInterval(updatePresence, 60_000);
+		window.setInterval(updateElapsed, 1_000);
 	}
 </script>

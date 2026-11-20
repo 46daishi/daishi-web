@@ -13,7 +13,7 @@ import springPoemsIcon from '../assets/icons/spring-poems.png';
 import tomoyoIcon from '../assets/icons/tomoyo.png';
 import interestJapanese from '../assets/interests/japanese.png';
 import interestLinux from '../assets/interests/programming.webp';
-import interestMahjong from '../assets/interests/mahjong.jpg';
+import interestMahjong from '../assets/interests/mahjong.png';
 import interestProgramming from '../assets/interests/linux.gif';
 import interestVisualNovels from '../assets/interests/visual-novels.png';
 import interestWriting from '../assets/interests/writing.gif';
@@ -22,6 +22,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import HanaDivider from '../components/HanaDivider.astro';
 import Header from '../components/Header.astro';
+import ProfileFacts from '../components/ProfileFacts.astro';
 import { SITE_TITLE } from '../consts';
 
 const favoriteMedia = [
@@ -81,19 +82,31 @@ const bioParagraphs: BioToken[][] = [
 					</figure>
 
 					<nav class="profile-links" aria-label="Media profiles">
-						<a href="https://vndb.org/u325493" target="_blank" rel="noreferrer">
-							<span class="profile-link-icon" aria-hidden="true">{'\u{f05da}'}</span>
-							VNDB
+						<a href="https://vndb.org/u325493" target="_blank" rel="noreferrer" aria-label="VNDB profile">
+							<span class="sr-only">VNDB</span>
+							<img src="/icons/vndb.ico" alt="" width="16" height="16" />
 						</a>
-						<a href="https://anilist.co/user/46dai/" target="_blank" rel="noreferrer">
-							<span class="profile-link-icon" aria-hidden="true">{'\u{f02d5}'}</span>
-							AniList
+						<a href="https://anilist.co/user/46dai/" target="_blank" rel="noreferrer" aria-label="AniList profile">
+							<span class="sr-only">AniList</span>
+							<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+								<path
+									fill="currentColor"
+									d="M24 17.53v2.421c0 .71-.391 1.101-1.1 1.101h-5l-.057-.165L11.84 3.736c.106-.502.46-.788 1.053-.788h2.422c.71 0 1.1.391 1.1 1.1v12.38H22.9c.71 0 1.1.392 1.1 1.101zM11.034 2.947l6.337 18.104h-4.918l-1.052-3.131H6.019l-1.077 3.131H0L6.361 2.948h4.673zm-.66 10.96-1.69-5.014-1.541 5.015h3.23z"
+								/>
+							</svg>
 						</a>
-						<a href="https://steamcommunity.com/id/46dai/" target="_blank" rel="noreferrer">
-							<span class="profile-link-icon" aria-hidden="true">{'\u{f1b6}'}</span>
-							Steam
+						<a href="https://steamcommunity.com/id/46dai/" target="_blank" rel="noreferrer" aria-label="Steam profile">
+							<span class="sr-only">Steam</span>
+							<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+								<path
+									fill="currentColor"
+									d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"
+								/>
+							</svg>
 						</a>
 					</nav>
+
+					<ProfileFacts />
 				</div>
 
 				<div class="about-copy">
@@ -440,41 +453,38 @@ const bioParagraphs: BioToken[][] = [
 	}
 
 	.profile-links {
-		display: grid;
-		gap: 0.4rem;
-		margin-top: 0.75rem;
-		font-family: var(--font-mono);
-		font-size: 0.8rem;
-		font-weight: 600;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.1rem;
+		margin-top: 0.4rem;
+		color: hsl(var(--muted-foreground));
 	}
 
 	.profile-links a {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.4rem;
-		padding: 0.4rem 0.75rem;
-		border: 1px solid hsl(var(--border));
-		border-radius: 0.35rem;
-		background: hsl(var(--card));
-		color: hsl(var(--foreground));
+		display: grid;
+		place-items: center;
+		width: 30px;
+		height: 30px;
+		color: inherit;
 		text-decoration: none;
-		transition:
-			border-color 0.16s ease,
-			color 0.16s ease;
+		transition: color 0.16s ease;
 	}
 
 	.profile-links a:hover,
 	.profile-links a:focus-visible {
-		border-color: hsl(var(--primary) / 0.6);
 		color: hsl(var(--primary));
 	}
 
-	.profile-link-icon {
-		display: inline-flex;
-		font-family: var(--font-symbols);
-		font-size: 0.95rem;
-		line-height: 1;
+	.profile-links img,
+	.profile-links svg {
+		width: 16px;
+		height: 16px;
+		border: 0;
+	}
+
+	.profile-links img {
+		image-rendering: pixelated;
 	}
 
 	.about-socials {
