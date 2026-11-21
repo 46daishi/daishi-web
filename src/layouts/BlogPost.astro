@@ -26,7 +26,13 @@ const {
 
 <html lang="en">
 	<head>
-		<BaseHead title={title} description={description} />
+		<BaseHead
+			title={title}
+			description={description}
+			image={heroImage}
+			imageAlt={heroImage ? `${title} thumbnail` : undefined}
+			ogType="article"
+		/>
 		<script is:inline>
 			const homepagePreview = new URLSearchParams(window.location.search).get('homepagePreview');
 			if (homepagePreview === 'featured' || homepagePreview === 'recent') {

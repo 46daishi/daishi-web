@@ -112,7 +112,7 @@ const featuredProjects = projects
 						class="intro-presence"
 						data-lanyard-presence
 						data-endpoint="https://api.lanyard.rest/v1/users/222405088986005504"
-						aria-label="Discord activity"
+						aria-label="Discord presence"
 					>
 						<div class="presence-art" data-presence-art hidden>
 							<span
@@ -166,7 +166,7 @@ const featuredProjects = projects
 								<span class="presence-divider" aria-hidden="true">·</span>
 								<span class="presence-indicator" data-presence-indicator></span>
 								<span class="presence-status" data-presence-status>Checking Discord</span>
-								<span class="presence-divider" aria-hidden="true">·</span>
+								<span class="presence-divider" data-presence-kind-divider aria-hidden="true">·</span>
 								<span class="presence-kind" data-presence-kind>Rich presence</span>
 							</div>
 							<strong class="presence-name" data-presence-name>Loading activity…</strong>
@@ -1256,6 +1256,161 @@ const featuredProjects = projects
 		};
 	};
 
+	type WikidataSearchResult = {
+		id: string;
+		label: string;
+		description?: string;
+	};
+
+	type WikidataEntity = {
+		claims?: {
+			P18?: Array<{
+				mainsnak?: {
+					datavalue?: {
+						value?: string;
+					};
+				};
+			}>;
+		};
+		sitelinks?: {
+			enwiki?: {
+				title?: string;
+			};
+		};
+	};
+
+	type WikidataSearchResponse = {
+		search?: WikidataSearchResult[];
+	};
+
+	type WikipediaSummary = {
+		description?: string;
+		thumbnail?: {
+			source?: string;
+		};
+	};
+
+	type WikipediaSearchResponse = {
+		query?: {
+			search?: Array<{
+				title: string;
+				snippet: string;
+			}>;
+		};
+	};
+
+	const activityImageFallbacks: Record<string, string> = {
+		'1266470168268378245': 'https://cdn2.steamgriddb.com/thumb/6fb0de15f0b5cf7c5062ed8d8271a488.jpg',
+	};
+	const gameArtworkCache = new Map<string, string | null>();
+
+	const findGameArtwork = async (name: string): Promise<string | null> => {
+		const cacheKey = name.trim().toLocaleLowerCase();
+		if (gameArtworkCache.has(cacheKey)) return gameArtworkCache.get(cacheKey) ?? null;
+
+		const searchUrl = new URL('https://www.wikidata.org/w/api.php');
+		searchUrl.search = new URLSearchParams({
+			action: 'wbsearchentities',
+			search: name,
+			language: 'en',
+			format: 'json',
+			origin: '*',
+		}).toString();
+		const searchResponse = await fetch(searchUrl, {
+			signal: AbortSignal.timeout(5_000),
+		});
+		if (!searchResponse.ok) {
+			throw new Error(`Wikidata search returned HTTP ${searchResponse.status}`);
+		}
+		const search = (await searchResponse.json()) as WikidataSearchResponse;
+		const gameEntity = search.search?.find(
+			(result) =>
+				result.label.trim().toLocaleLowerCase() === cacheKey &&
+				/\b(video game|game)\b/i.test(result.description ?? ''),
+		);
+		let articleTitle: string | undefined;
+		if (gameEntity) {
+			const entityResponse = await fetch(
+				`https://www.wikidata.org/wiki/Special:EntityData/${encodeURIComponent(gameEntity.id)}.json`,
+				{ signal: AbortSignal.timeout(5_000) },
+			);
+			if (!entityResponse.ok) {
+				throw new Error(`Wikidata entity lookup returned HTTP ${entityResponse.status}`);
+			}
+			const entityPayload = (await entityResponse.json()) as {
+				entities?: Record<string, WikidataEntity>;
+			};
+			const entity = entityPayload.entities?.[gameEntity.id];
+			const imageFile = entity?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
+			if (imageFile) {
+				const imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(imageFile)}?width=512`;
+				gameArtworkCache.set(cacheKey, imageUrl);
+				return imageUrl;
+			}
+			articleTitle = entity?.sitelinks?.enwiki?.title;
+		}
+
+		if (articleTitle) {
+			const summaryResponse = await fetch(
+				`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(articleTitle.replaceAll(' ', '_'))}`,
+				{ signal: AbortSignal.timeout(5_000) },
+			);
+			if (summaryResponse.ok) {
+				const summary = (await summaryResponse.json()) as WikipediaSummary;
+				if (
+					/\b(video game|game)\b/i.test(summary.description ?? '') &&
+					summary.thumbnail?.source
+				) {
+					gameArtworkCache.set(cacheKey, summary.thumbnail.source);
+					return summary.thumbnail.source;
+				}
+			} else if (summaryResponse.status !== 404) {
+				throw new Error(`Wikipedia summary returned HTTP ${summaryResponse.status}`);
+			}
+		}
+
+		const wikipediaSearchUrl = new URL('https://en.wikipedia.org/w/api.php');
+		wikipediaSearchUrl.search = new URLSearchParams({
+			action: 'query',
+			list: 'search',
+			srsearch: name,
+			srlimit: '5',
+			format: 'json',
+			origin: '*',
+		}).toString();
+		const wikipediaSearchResponse = await fetch(wikipediaSearchUrl, {
+			signal: AbortSignal.timeout(5_000),
+		});
+		if (!wikipediaSearchResponse.ok) {
+			throw new Error(`Wikipedia search returned HTTP ${wikipediaSearchResponse.status}`);
+		}
+		const wikipediaSearch = (await wikipediaSearchResponse.json()) as WikipediaSearchResponse;
+		for (const result of wikipediaSearch.query?.search ?? []) {
+			if (!/\b(video game|visual novel|game)\b/i.test(result.snippet.replace(/<[^>]*>/g, ''))) {
+				continue;
+			}
+			const summaryResponse = await fetch(
+				`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(result.title.replaceAll(' ', '_'))}`,
+				{ signal: AbortSignal.timeout(5_000) },
+			);
+			if (summaryResponse.status === 404) continue;
+			if (!summaryResponse.ok) {
+				throw new Error(`Wikipedia summary returned HTTP ${summaryResponse.status}`);
+			}
+			const summary = (await summaryResponse.json()) as WikipediaSummary;
+			if (
+				/\b(video game|visual novel|game)\b/i.test(summary.description ?? '') &&
+				summary.thumbnail?.source
+			) {
+				gameArtworkCache.set(cacheKey, summary.thumbnail.source);
+				return summary.thumbnail.source;
+			}
+		}
+
+		gameArtworkCache.set(cacheKey, null);
+		return null;
+	};
+
 	const presence = document.querySelector<HTMLElement>('[data-lanyard-presence]');
 
 	if (presence) {
@@ -1263,6 +1418,7 @@ const featuredProjects = projects
 		const indicator = presence.querySelector<HTMLElement>('[data-presence-indicator]');
 		const statusLabel = presence.querySelector<HTMLElement>('[data-presence-status]');
 		const kindLabel = presence.querySelector<HTMLElement>('[data-presence-kind]');
+		const kindDivider = presence.querySelector<HTMLElement>('[data-presence-kind-divider]');
 		const nameLabel = presence.querySelector<HTMLElement>('[data-presence-name]');
 		const detailLabel = presence.querySelector<HTMLElement>('[data-presence-detail]');
 		const stateLabel = presence.querySelector<HTMLElement>('[data-presence-state]');
@@ -1330,7 +1486,7 @@ const featuredProjects = projects
 			elapsed.hidden = false;
 		};
 
-		const renderPresence = (data: NonNullable<LanyardPresence['data']>) => {
+		const renderPresence = async (data: NonNullable<LanyardPresence['data']>) => {
 			const status = data.discord_status;
 			if (indicator) indicator.dataset.status = status;
 			if (statusLabel) {
@@ -1345,14 +1501,77 @@ const featuredProjects = projects
 			}
 
 			const spotify = data.listening_to_spotify ? data.spotify : null;
+			const supportedActivities = data.activities.filter(
+				(item) => item.type === 0 || item.type === 2 || item.type === 3 || item.type === 5,
+			);
 			const activity =
-				data.activities.find((item) => item.type === 0 || item.type === 2 || item.type === 3 || item.type === 5) ??
+				supportedActivities.find(
+					(item) =>
+						item.type === 0 &&
+						(item.assets?.large_image || item.assets?.small_image),
+				) ??
+				supportedActivities.find((item) => item.type === 0) ??
+				supportedActivities.find((item) => item.name !== 'Spotify') ??
 				null;
 			const spotifyActivity = data.activities.find((item) => item.name === 'Spotify');
 			const activeActivity = spotify ? spotifyActivity : activity;
-			const imageUrl =
+			elapsedStartedAt = spotify
+				? spotify.timestamps?.start ?? spotifyActivity?.created_at ?? null
+				: activity?.timestamps?.start ?? activity?.created_at ?? null;
+			updateElapsed();
+
+			if (spotify) {
+				if (kindLabel) {
+					kindLabel.textContent = 'Listening to Spotify';
+					kindLabel.hidden = false;
+				}
+				if (kindDivider) kindDivider.hidden = false;
+				if (nameLabel) nameLabel.textContent = spotify.song;
+				setOptionalText(detailLabel, `by ${spotify.artist}`);
+				setOptionalText(stateLabel, spotify.album);
+			} else if (activity) {
+				if (kindLabel) {
+					kindLabel.textContent =
+						activity.type === 3
+							? 'Watching'
+							: activity.type === 2
+								? 'Listening to'
+								: activity.type === 5
+									? 'Competing in'
+									: 'Playing';
+					kindLabel.hidden = false;
+				}
+				if (kindDivider) kindDivider.hidden = false;
+				if (nameLabel) nameLabel.textContent = activity.name;
+				setOptionalText(detailLabel, activity.details);
+				setOptionalText(stateLabel, activity.state);
+			} else {
+				if (kindLabel) {
+					kindLabel.textContent = '';
+					kindLabel.hidden = true;
+				}
+				if (kindDivider) kindDivider.hidden = true;
+				if (nameLabel) {
+					nameLabel.textContent =
+						status === 'offline' ? 'Not online right now' : 'Not playing anything right now';
+				}
+				setOptionalText(detailLabel);
+				setOptionalText(stateLabel);
+			}
+
+			let imageUrl =
 				(spotify ? spotify.album_art_url : '') ||
-				getAssetUrl(activeActivity?.assets?.large_image, activeActivity?.application_id);
+				getAssetUrl(activeActivity?.assets?.large_image, activeActivity?.application_id) ||
+				(activity?.application_id
+					? activityImageFallbacks[activity.application_id] ?? ''
+					: '');
+			if (!imageUrl && activity) {
+				try {
+					imageUrl = (await findGameArtwork(activity.name)) ?? '';
+				} catch (error) {
+					console.warn(`Unable to find catalog artwork for "${activity.name}".`, error);
+				}
+			}
 			const smallImageUrl = getAssetUrl(
 				activeActivity?.assets?.small_image,
 				activeActivity?.application_id,
@@ -1371,39 +1590,6 @@ const featuredProjects = projects
 					? (activeActivity?.assets?.small_text ?? activeActivity?.name)
 					: '',
 			);
-			elapsedStartedAt = spotify
-				? spotify.timestamps?.start ?? spotifyActivity?.created_at ?? null
-				: activity?.timestamps?.start ?? activity?.created_at ?? null;
-			updateElapsed();
-
-			if (spotify) {
-				if (kindLabel) kindLabel.textContent = 'Listening to Spotify';
-				if (nameLabel) nameLabel.textContent = spotify.song;
-				setOptionalText(detailLabel, `by ${spotify.artist}`);
-				setOptionalText(stateLabel, spotify.album);
-			} else if (activity) {
-				if (kindLabel) {
-					kindLabel.textContent =
-						activity.type === 3
-							? 'Watching'
-							: activity.type === 2
-								? 'Listening to'
-								: activity.type === 5
-									? 'Competing in'
-									: 'Playing';
-				}
-				if (nameLabel) nameLabel.textContent = activity.name;
-				setOptionalText(detailLabel, activity.details);
-				setOptionalText(stateLabel, activity.state);
-			} else {
-				if (kindLabel) kindLabel.textContent = 'Discord activity';
-				if (nameLabel) {
-					nameLabel.textContent =
-						status === 'offline' ? 'Not online right now' : 'Not playing anything right now';
-				}
-				setOptionalText(detailLabel);
-				setOptionalText(stateLabel);
-			}
 
 			if (image && art && placeholder) {
 				image.onerror = () => {
@@ -1442,7 +1628,7 @@ const featuredProjects = projects
 				if (!response.ok) throw new Error(`Lanyard returned HTTP ${response.status}`);
 				const result = (await response.json()) as LanyardPresence;
 				if (!result.success || !result.data) throw new Error('Lanyard returned no presence data');
-				renderPresence(result.data);
+				await renderPresence(result.data);
 			} catch (error) {
 				if (statusLabel) statusLabel.textContent = 'Discord status unavailable';
 				if (kindLabel) kindLabel.textContent = 'Retrying';

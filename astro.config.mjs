@@ -8,7 +8,7 @@ import svelte from '@astrojs/svelte';
 
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://daishi.github.io',
+    site: 'https://daishi.moe',
     integrations: [mdx(), sitemap(), svelte()],
     fonts: [
         {
@@ -62,7 +62,7 @@ export default defineConfig({
         },
         {
             provider: fontProviders.local(),
-            name: 'IBM Plex Serif',
+            name: 'Literata',
             cssVariable: '--font-serif',
             fallbacks: [
                 'Georgia',
@@ -76,27 +76,15 @@ export default defineConfig({
             options: {
                 variants: [
                     {
-                        src: ['./src/assets/fonts/ibm-plex-serif-400-normal.woff2'],
-                        weight: 400,
+                        src: ['./src/assets/fonts/literata-variable.woff2'],
+                        weight: '400 700',
                         style: 'normal',
                         display: 'swap',
                     },
                     {
-                        src: ['./src/assets/fonts/ibm-plex-serif-400-italic.woff2'],
-                        weight: 400,
+                        src: ['./src/assets/fonts/literata-italic-variable.woff2'],
+                        weight: '400 700',
                         style: 'italic',
-                        display: 'swap',
-                    },
-                    {
-                        src: ['./src/assets/fonts/ibm-plex-serif-600-normal.woff2'],
-                        weight: 600,
-                        style: 'normal',
-                        display: 'swap',
-                    },
-                    {
-                        src: ['./src/assets/fonts/ibm-plex-serif-700-normal.woff2'],
-                        weight: 700,
-                        style: 'normal',
                         display: 'swap',
                     },
                 ],
