@@ -11,6 +11,7 @@ interface Props {
 	title: string;
 	description: string;
 	image?: ImageMetadata;
+	imageUrl?: string;
 	imageAlt?: string;
 	ogType?: 'website' | 'article';
 	themeColor?: string;
@@ -23,12 +24,13 @@ const {
 	title,
 	description,
 	image = DefaultShareImage,
+	imageUrl,
 	imageAlt = `${title} preview image`,
 	ogType = 'website',
 	themeColor = '#008AFF',
 	favicon,
 } = Astro.props;
-const socialImage = new URL(image.src, Astro.url);
+const socialImage = new URL(imageUrl ?? image.src, Astro.url);
 ---
 
 <!-- Global Metadata -->

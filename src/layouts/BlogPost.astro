@@ -30,7 +30,8 @@ const {
 			title={title}
 			description={description}
 			image={heroImage}
-			imageAlt={heroImage ? `${title} thumbnail` : undefined}
+			imageUrl={heroImage ? undefined : new URL('preview.png', Astro.url).href}
+			imageAlt={`${title} preview`}
 			ogType="article"
 		/>
 		<script is:inline>
