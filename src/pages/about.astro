@@ -627,6 +627,7 @@ const bioParagraphs: BioToken[][] = [
 			grid-template-columns: minmax(0, 7rem) minmax(0, 1fr);
 			grid-template-areas:
 				"portrait heading"
+				"portrait facts"
 				"links facts"
 				"bio bio";
 			column-gap: 1rem;
@@ -647,7 +648,7 @@ const bioParagraphs: BioToken[][] = [
 
 		.about-heading {
 			grid-area: heading;
-			align-self: center;
+			align-self: start;
 			margin-bottom: 0;
 		}
 

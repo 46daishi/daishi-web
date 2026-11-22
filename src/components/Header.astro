@@ -319,36 +319,45 @@ const navItems = [
 
 	@media (max-width: 719px) {
 		.header-inner {
-			flex-wrap: nowrap;
-			gap: 0.35rem;
-			padding-top: 0.55rem;
-			padding-bottom: 0.35rem;
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) auto;
+			grid-template-areas:
+				"brand brand"
+				"nav actions";
+			gap: 0.15rem 0.5rem;
+			min-height: 0;
+			padding-top: 0.35rem;
+			padding-bottom: 0.4rem;
 		}
 
 		.brand {
+			grid-area: brand;
 			gap: 0.4rem;
+			min-height: 38px;
 		}
 
 		.brand-name {
 			font-size: 1rem;
 		}
 
+		.project-name {
+			display: none;
+		}
+
 		.site-nav {
-			flex: 0 1 auto;
-			margin-left: auto;
+			grid-area: nav;
+			justify-self: start;
+			margin-left: 0;
 		}
 
 		.site-nav ul {
 			flex-wrap: nowrap;
-			gap: 0.35rem;
+			justify-content: flex-start;
+			gap: 0.3rem;
 		}
 
 		.site-nav li {
-			gap: 0;
-		}
-
-		.nav-sep {
-			display: none;
+			gap: 0.3rem;
 		}
 
 		.site-nav a {
@@ -357,6 +366,8 @@ const navItems = [
 		}
 
 		.header-actions {
+			grid-area: actions;
+			justify-self: end;
 			margin-left: 0;
 		}
 
@@ -376,7 +387,7 @@ const navItems = [
 
 	@media (max-width: 380px) {
 		.header-inner {
-			gap: 0.2rem;
+			column-gap: 0.2rem;
 			padding-right: 0.65rem;
 			padding-left: 0.65rem;
 		}
@@ -390,6 +401,10 @@ const navItems = [
 		}
 
 		.site-nav ul {
+			gap: 0.2rem;
+		}
+
+		.site-nav li {
 			gap: 0.2rem;
 		}
 

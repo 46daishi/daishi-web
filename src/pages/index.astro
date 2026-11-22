@@ -1159,6 +1159,11 @@ const featuredProjects = projects
 			font-size: 0.76rem;
 		}
 
+		.presence-provider,
+		.presence-provider + .presence-divider {
+			display: none;
+		}
+
 		.featured-posts {
 			margin: 2.5rem 0 2.5rem;
 		}
@@ -1443,6 +1448,7 @@ const featuredProjects = projects
 		const endpoint = presence.dataset.endpoint;
 		const indicator = presence.querySelector<HTMLElement>('[data-presence-indicator]');
 		const statusLabel = presence.querySelector<HTMLElement>('[data-presence-status]');
+		const compactStatusMedia = window.matchMedia('(max-width: 719px)');
 		const kindLabel = presence.querySelector<HTMLElement>('[data-presence-kind]');
 		const kindDivider = presence.querySelector<HTMLElement>('[data-presence-kind-divider]');
 		const nameLabel = presence.querySelector<HTMLElement>('[data-presence-name]');
@@ -1459,6 +1465,28 @@ const featuredProjects = projects
 		const smallTooltip = presence.querySelector<HTMLElement>('[data-presence-small-tooltip]');
 		const elapsed = presence.querySelector<HTMLTimeElement>('[data-presence-elapsed]');
 		let elapsedStartedAt: number | null = null;
+
+		const updateStatusLabel = () => {
+			if (!statusLabel) return;
+			const status = statusLabel.dataset.status;
+			statusLabel.textContent =
+				status === 'dnd'
+					? compactStatusMedia.matches
+						? 'DND'
+						: 'Do not disturb'
+					: status === 'idle'
+						? 'Idle'
+						: status === 'online'
+							? 'Online'
+							: status === 'offline'
+								? 'Offline'
+								: compactStatusMedia.matches
+									? 'Checking'
+									: 'Checking Discord';
+		};
+
+		compactStatusMedia.addEventListener('change', updateStatusLabel);
+		updateStatusLabel();
 
 		const setOptionalText = (element: HTMLElement | null, value?: string | null) => {
 			if (!element) return;
@@ -1516,14 +1544,8 @@ const featuredProjects = projects
 			const status = data.discord_status;
 			if (indicator) indicator.dataset.status = status;
 			if (statusLabel) {
-				statusLabel.textContent =
-					status === 'dnd'
-						? 'Do not disturb'
-						: status === 'idle'
-							? 'Idle'
-							: status === 'online'
-								? 'Online'
-								: 'Offline';
+				statusLabel.dataset.status = status;
+				updateStatusLabel();
 			}
 
 			const spotify = data.listening_to_spotify ? data.spotify : null;
