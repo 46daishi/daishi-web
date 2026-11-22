@@ -6,7 +6,6 @@ type PreviewProps = {
 	description: string;
 	pubDate: string;
 	tags: string[];
-	project?: string;
 };
 
 const escapeXml = (value: string) =>
@@ -46,7 +45,6 @@ export async function getStaticPaths() {
 				description: post.data.description,
 				pubDate: post.data.pubDate.toISOString(),
 				tags: post.data.tags,
-				project: post.data.project,
 			},
 		}));
 }
@@ -62,25 +60,25 @@ export async function GET({ props }: { props: PreviewProps }) {
 	const titleSvg = titleLines
 		.map(
 			(line, index) =>
-				`<text x="72" y="${titleStartY + index * 62}" fill="#d7e0ef" font-family="sans-serif" font-size="48" font-weight="700" letter-spacing="-1">${escapeXml(line)}</text>`,
+				`<text x="72" y="${titleStartY + index * 62}" fill="#d7e0ef" font-family="Sazanami Gothic" font-size="48" font-weight="700" letter-spacing="-1">${escapeXml(line)}</text>`,
 		)
 		.join('');
 	const descriptionY = titleStartY + titleLines.length * 62 + 20;
 	const tagsSvg =
 		tags.length > 0
-			? `<text x="72" y="${descriptionY + descriptionLines.length * 42 + 36}" fill="#d7e0ef" font-family="monospace" font-size="30" font-weight="600">${escapeXml(tags.join('  '))}</text>`
+			? `<text x="72" y="${descriptionY + descriptionLines.length * 42 + 36}" fill="#d7e0ef" font-family="IBM Plex Mono" font-size="30" font-weight="600">${escapeXml(tags.join('  '))}</text>`
 			: '';
 	const descriptionSvg = descriptionLines
 		.map(
 			(line, index) =>
-				`<text x="72" y="${descriptionY + index * 42}" fill="#b0bccc" font-family="sans-serif" font-size="36">${escapeXml(line)}</text>`,
+				`<text x="72" y="${descriptionY + index * 42}" fill="#b0bccc" font-family="Sazanami Gothic" font-size="36">${escapeXml(line)}</text>`,
 		)
 		.join('');
 	const svg = Buffer.from(`
 		<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
 			<rect width="1200" height="630" fill="#101214" />
 			<rect x="28" y="28" width="1144" height="574" rx="24" fill="none" stroke="#28364d" stroke-width="2" />
-			<text x="72" y="92" fill="#aab4c5" font-family="monospace" font-size="30">${escapeXml(dateLabel)}</text>
+			<text x="72" y="92" fill="#aab4c5" font-family="IBM Plex Mono, Sazanami Gothic" font-size="30">${escapeXml(dateLabel)}</text>
 			${titleSvg}
 			${tagsSvg}
 			${descriptionSvg}

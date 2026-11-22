@@ -1,10 +1,21 @@
 // @ts-check
 
+import { writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
 
 import svelte from '@astrojs/svelte';
+
+const fontConfigPath = join(tmpdir(), `daishi-fontconfig-${process.pid}.xml`);
+const fontDirectory = resolve('src/assets/fonts').replaceAll('&', '&amp;').replaceAll('<', '&lt;');
+await writeFile(
+    fontConfigPath,
+    `<fontconfig><include ignore_missing="yes">/etc/fonts/fonts.conf</include><dir>${fontDirectory}</dir><cachedir>${tmpdir()}</cachedir></fontconfig>`,
+);
+process.env.FONTCONFIG_FILE = fontConfigPath;
 
 // https://astro.build/config
 export default defineConfig({
