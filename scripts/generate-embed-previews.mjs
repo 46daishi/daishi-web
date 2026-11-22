@@ -1,17 +1,18 @@
 import { execFile } from 'node:child_process';
 import { createReadStream } from 'node:fs';
-import { mkdtemp, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdtemp, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { promisify } from 'node:util';
 import sharp from 'sharp';
 
-// Blog posts without a hero image use a generated Open Graph image. Replace
-// the generated fallback with a screenshot of the post page so the embed
-// matches the preview shown on the blog index.
+// Blog posts without a hero image use a screenshot of the post page as their
+// Open Graph image so the embed matches the preview shown on the blog index.
 const execFileAsync = promisify(execFile);
 const distDirectory = resolve('dist');
+const fallbackImage = resolve('src/assets/og-default.png');
+const embedFileName = 'embed.png';
 const screenshotWidth = 1200;
 const screenshotHeight = 630;
 
@@ -114,7 +115,7 @@ const main = async () => {
 		const html = await readFile(page, 'utf8');
 		const ogImage = html.match(/<meta property="og:image" content="([^"]+)"/);
 
-		if (ogImage?.[1].endsWith('/preview-v2.png')) imagelessPages.push(page);
+		if (ogImage?.[1].endsWith(`/${embedFileName}`)) imagelessPages.push(page);
 	}
 
 	if (imagelessPages.length === 0) return;
@@ -122,7 +123,10 @@ const main = async () => {
 	const firefox = await findFirefox();
 
 	if (!firefox) {
-		console.warn('Firefox not found; keeping the generated preview fallbacks.');
+		console.warn('Firefox not found; using the default site image for embed previews.');
+		await Promise.all(
+			imagelessPages.map((page) => copyFile(fallbackImage, join(dirname(page), embedFileName))),
+		);
 		return;
 	}
 
@@ -142,7 +146,7 @@ const main = async () => {
 	try {
 		for (const page of imagelessPages) {
 			const pageDirectory = dirname(page);
-			const output = join(pageDirectory, 'preview-v2.png');
+			const output = join(pageDirectory, embedFileName);
 			const temporaryOutput = `${output}.tmp.png`;
 			const slug = relative(join(distDirectory, 'blog'), pageDirectory).split(sep).join('/');
 			const url = `${origin}/blog/${slug.split('/').map(encodeURIComponent).join('/')}/`;
@@ -172,6 +176,7 @@ const main = async () => {
 				console.log(`Generated embed preview for /blog/${slug}/`);
 			} catch (error) {
 				console.warn(`Could not generate embed preview for /blog/${slug}/: ${error.message}`);
+				await copyFile(fallbackImage, output);
 			} finally {
 				await rm(temporaryOutput, { force: true });
 				await rm(`${temporaryOutput}.optimized.png`, { force: true });

@@ -79,6 +79,10 @@ body {
 	overflow-wrap: break-word;
 }
 
+.date-ja {
+	font-family: var(--font-sazanami);
+}
+
 main {
 	flex: 1;
 	width: 100%;
