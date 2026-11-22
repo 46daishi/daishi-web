@@ -1,5 +1,3 @@
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
 import { getCollection } from 'astro:content';
 import sharp from 'sharp';
 
@@ -56,49 +54,39 @@ export async function getStaticPaths() {
 export async function GET({ props }: { props: PreviewProps }) {
 	const date = new Date(props.pubDate);
 	const dateLabel = `${date.getUTCFullYear()}年 ${String(date.getUTCMonth() + 1).padStart(2, '0')}月 ${String(date.getUTCDate()).padStart(2, '0')}日`;
-	const titleLines = wrapText(props.title, 34, 3);
+	const titleLines = wrapText(props.title, 38, 2);
 	const descriptionLines = wrapText(props.description, 76, 2);
-	const titleStartY = 300 + (3 - titleLines.length) * 32;
-	const tags = [...props.tags.map((tag) => `#${tag.trim().replace(/\s+/g, '-')}`)];
-	if (props.project) tags.push(`#${props.project}`);
+	const titleStartY = 168;
+	const tags = props.tags.map((tag) => `#${tag.trim().replace(/\s+/g, '-')}`);
 
 	const titleSvg = titleLines
 		.map(
 			(line, index) =>
-				`<text x="600" y="${titleStartY + index * 66}" text-anchor="middle" fill="#171e2a" font-family="monospace" font-size="58" font-weight="600" letter-spacing="-2">${escapeXml(line)}</text>`,
+				`<text x="72" y="${titleStartY + index * 62}" fill="#d7e0ef" font-family="sans-serif" font-size="48" font-weight="700" letter-spacing="-1">${escapeXml(line)}</text>`,
 		)
 		.join('');
+	const descriptionY = titleStartY + titleLines.length * 62 + 20;
 	const tagsSvg =
 		tags.length > 0
-			? `<text x="600" y="${titleStartY + titleLines.length * 66 + 12}" text-anchor="middle" fill="#008aff" font-family="monospace" font-size="24" font-weight="600">${escapeXml(tags.join('  '))}</text>`
+			? `<text x="72" y="${descriptionY + descriptionLines.length * 42 + 36}" fill="#d7e0ef" font-family="monospace" font-size="30" font-weight="600">${escapeXml(tags.join('  '))}</text>`
 			: '';
-	const descriptionY = titleStartY + titleLines.length * 66 + (tags.length > 0 ? 58 : 40);
 	const descriptionSvg = descriptionLines
 		.map(
 			(line, index) =>
-				`<text x="600" y="${descriptionY + index * 36}" text-anchor="middle" fill="#596675" font-family="monospace" font-size="23">${escapeXml(line)}</text>`,
+				`<text x="72" y="${descriptionY + index * 42}" fill="#b0bccc" font-family="sans-serif" font-size="36">${escapeXml(line)}</text>`,
 		)
 		.join('');
 	const svg = Buffer.from(`
 		<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-			<rect width="1200" height="630" fill="#f7fafc" />
-			<text x="142" y="94" fill="#171e2a" font-family="monospace" font-size="40" font-weight="600" letter-spacing="-2">daishi</text>
-			<text x="282" y="94" fill="#008aff" font-family="monospace" font-size="40" font-weight="600" letter-spacing="-2">.moe</text>
-			<path d="M0 128h1200" stroke="#d4dee8" />
-			<text x="600" y="220" text-anchor="middle" fill="#657386" font-family="monospace" font-size="24" font-weight="600">${escapeXml(dateLabel)}</text>
+			<rect width="1200" height="630" fill="#101214" />
+			<rect x="28" y="28" width="1144" height="574" rx="24" fill="none" stroke="#28364d" stroke-width="2" />
+			<text x="72" y="92" fill="#aab4c5" font-family="monospace" font-size="30">${escapeXml(dateLabel)}</text>
 			${titleSvg}
 			${tagsSvg}
 			${descriptionSvg}
 		</svg>
 	`);
-	const logo = await sharp(await readFile(resolve(process.cwd(), 'src/assets/46hana.png')))
-		.resize(44, 44)
-		.png()
-		.toBuffer();
-	const image = await sharp(svg)
-		.composite([{ input: logo, left: 80, top: 50 }])
-		.png()
-		.toBuffer();
+	const image = await sharp(svg).png().toBuffer();
 
 	return new Response(image, {
 		headers: {
