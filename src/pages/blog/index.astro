@@ -51,6 +51,12 @@ const projectFilters = (await getCollection('projects'))
 							</button>
 						))}
 					</div>
+					<select class="mobile-filter" aria-label="Filter posts by tag" data-mobile-tag-filter>
+						<option value="all">all tags</option>
+						{tags.map((tag) => (
+							<option value={tag}>#{tag.trim().replace(/\s+/g, '-')}</option>
+						))}
+					</select>
 				</nav>
 				<nav class="filter-row" aria-label="Filter posts by project">
 					<span class="filter-label">
@@ -79,6 +85,12 @@ const projectFilters = (await getCollection('projects'))
 							</button>
 						))}
 					</div>
+					<select class="mobile-filter" aria-label="Filter posts by project" data-mobile-project-filter>
+						<option value="all">all projects</option>
+						{projectFilters.map((project) => (
+							<option value={project.id}>{project.data.title}</option>
+						))}
+					</select>
 				</nav>
 			</div>
 			<p class="filter-count" data-filter-count aria-live="polite">
@@ -134,6 +146,8 @@ const projectFilters = (await getCollection('projects'))
 <script>
 	const tagButtons = [...document.querySelectorAll('[data-tag-filter]')];
 	const projectButtons = [...document.querySelectorAll('[data-project-filter]')];
+	const mobileTagFilter = document.querySelector<HTMLSelectElement>('[data-mobile-tag-filter]');
+	const mobileProjectFilter = document.querySelector<HTMLSelectElement>('[data-mobile-project-filter]');
 	const posts = [...document.querySelectorAll('[data-post-tags]')];
 	const count = document.querySelector('[data-filter-count]');
 	const emptyState = document.querySelector('[data-empty-state]');
@@ -169,6 +183,7 @@ const projectFilters = (await getCollection('projects'))
 	tagButtons.forEach((button) => {
 		button.addEventListener('click', () => {
 			selectedTag = button.dataset.tagFilter;
+			if (mobileTagFilter) mobileTagFilter.value = selectedTag;
 			updatePressed(tagButtons, selectedTag, 'data-tag-filter');
 			updatePosts();
 		});
@@ -177,9 +192,18 @@ const projectFilters = (await getCollection('projects'))
 	projectButtons.forEach((button) => {
 		button.addEventListener('click', () => {
 			selectedProject = button.dataset.projectFilter;
+			if (mobileProjectFilter) mobileProjectFilter.value = selectedProject;
 			updatePressed(projectButtons, selectedProject, 'data-project-filter');
 			updatePosts();
 		});
+	});
+
+	mobileTagFilter?.addEventListener('change', () => {
+		tagButtons.find((button) => button.dataset.tagFilter === mobileTagFilter.value)?.click();
+	});
+
+	mobileProjectFilter?.addEventListener('change', () => {
+		projectButtons.find((button) => button.dataset.projectFilter === mobileProjectFilter.value)?.click();
 	});
 </script>
 
@@ -237,6 +261,10 @@ const projectFilters = (await getCollection('projects'))
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.35rem;
+	}
+
+	.mobile-filter {
+		display: none;
 	}
 
 	.tag-filter {
@@ -392,9 +420,27 @@ const projectFilters = (await getCollection('projects'))
 
 	@media (max-width: 640px) {
 		.filter-row {
-			align-items: flex-start;
-			flex-direction: column;
-			gap: 0.35rem;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.5rem;
+			padding: 0.6rem 0;
+		}
+
+		.filter-options {
+			display: none;
+		}
+
+		.mobile-filter {
+			display: block;
+			width: min(15rem, 72%);
+			min-width: 0;
+			padding: 0.45rem 0.6rem;
+			border: 1px solid hsl(var(--border));
+			border-radius: var(--radius);
+			background: hsl(var(--background));
+			color: hsl(var(--foreground));
+			font: inherit;
+			font-size: 0.78rem;
 		}
 
 		.post-grid {

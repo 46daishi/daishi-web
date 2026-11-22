@@ -21,6 +21,9 @@ process.env.FONTCONFIG_FILE = fontConfigPath;
 export default defineConfig({
     site: 'https://daishi.moe',
     integrations: [mdx(), sitemap(), svelte()],
+    build: {
+        inlineStylesheets: 'always',
+    },
     fonts: [
         {
             provider: fontProviders.local(),
