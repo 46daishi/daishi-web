@@ -37,6 +37,10 @@ const groups = [
         ...group,
         projects: group.projects.sort(
             (a, b) =>
+                Number(b.data.featured) - Number(a.data.featured) ||
+                (a.data.featured && b.data.featured
+                    ? a.data.featuredOrder - b.data.featuredOrder
+                    : 0) ||
                 PROJECT_STATUS_RANK[a.data.status] -
                     PROJECT_STATUS_RANK[b.data.status] ||
                 a.data.title.localeCompare(b.data.title),

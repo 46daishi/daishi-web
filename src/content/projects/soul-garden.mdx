@@ -7,7 +7,8 @@ color: '#008aff'
 type: light-novel
 status: active
 version: Volume 1
-featured: false
+featured: true
+featuredOrder: 3
 links:
   - label: Details
     href: /projects/soul-garden/
@@ -15,6 +16,20 @@ links:
 ---
 
 Soul Garden is a light novel set in the **Hoshi no Keiyko** universe after the VN series finale. Volume 1 will be available to read in January 2027!
+
+import thumbnail from '../../assets/widgets/shirogane.png';
+import banner from '../../assets/widgets/shirogane2.jpg';
+import ProjectProgress from '../../components/ProjectProgress.astro';
+
+<ProjectProgress
+  title="Progress"
+  description="Writing"
+  progressTitle="Volume 1"
+  progress={23}
+  status="Planning..."
+  banner={banner}
+  thumbnail={thumbnail}
+/>
 
 ## Story
 

@@ -1,0 +1,82 @@
+---
+interface Feature {
+	icon: string;
+	title: string;
+	description: string;
+}
+
+interface Props {
+	features: Feature[];
+}
+
+const { features } = Astro.props;
+---
+
+<section class="project-features" aria-label="Project features">
+	<ul class="feature-grid">
+		{features.map(({ icon, title, description }) => (
+			<li class="feature-item">
+				<span class="feature-icon" aria-hidden="true">{icon}</span>
+				<h3>{title}</h3>
+				<p>{description}</p>
+			</li>
+		))}
+	</ul>
+</section>
+
+<style>
+	.project-features {
+		margin: 2rem 0;
+	}
+
+	.feature-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 2rem 1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.feature-item {
+		min-width: 0;
+		text-align: center;
+	}
+
+	.feature-icon {
+		display: grid;
+		place-items: center;
+		width: 3rem;
+		height: 3rem;
+		margin: 0 auto 0.65rem;
+		border-radius: 50%;
+		background: color-mix(in srgb, hsl(var(--primary)) 13%, hsl(var(--card)));
+		color: hsl(var(--primary));
+		font-family: var(--font-symbols);
+		font-size: 1.3rem;
+		line-height: 1;
+	}
+
+	.feature-item h3 {
+		margin: 0;
+		font-family: var(--font-serif);
+		font-size: 0.95rem;
+		font-weight: 700;
+		line-height: 1.4;
+	}
+
+	.feature-item p {
+		margin: 0.25rem 0 0;
+		color: hsl(var(--muted-foreground));
+		font-family: var(--font-serif);
+		font-size: 0.82rem;
+		line-height: 1.55;
+	}
+
+	@media (max-width: 600px) {
+		.feature-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1.75rem 0.75rem;
+		}
+	}
+</style>
