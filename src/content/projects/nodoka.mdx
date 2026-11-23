@@ -9,7 +9,7 @@ status: active
 version: v1.0.0
 links:
   - label: Download
-    href: https://github.com/46daishi/nodoka
+    href: https://github.com/46daishi/nodoka/releases
     icon: "\ue709"
 ---
 
@@ -25,11 +25,19 @@ nodoka is a simple pomodoro/time tracker app with profiles and statistics.
 
 ## ✨ Features
 
-- ⏱️ **Pomodoro mode** — stay on track with structured focus and break intervals
-- 🌊 **Flow mode** — open-ended timer for deep work, with breaks sized as a percentage of your session
-- 👤 Switch between profiles for different kinds of work or routines
-- ✏️ Name your sessions to keep your day organized — autocompletes from your session history
-- 🎨 14 themes (8 dark, 6 light)
-- 📈 Track your progress over time with simple, readable charts and a session name breakdown
-- 🎵 Ambient sounds and white noise to help you stay in the zone
-- 🎮 Let others know you're focusing via detailed Discord Rich Presence
+import ProjectFeatures from '../../components/ProjectFeatures.astro';
+
+<ProjectFeatures
+  features={[
+    { icon: '\udb84\udfab', title: 'Pomodoro mode', description: 'Stay on track with structured focus and break intervals.' },
+    { icon: '\uf06d', title: 'Flow mode', description: 'Open-ended timer for deep work with breaks as a percentage of your session.' },
+    { icon: '\udb80\ude4c', title: 'Profiles', description: 'Switch between profiles for different kinds of work or routines.' },
+    { icon: '\udb80\udfeb', title: 'Session names', description: 'Name your sessions to make use of session-specific statistics.' },
+    { icon: '\udb80\udecb', title: 'Ambient sounds', description: 'Stay in the zone thanks to various ambience and white noise.' },
+    { icon: '\uf201', title: 'Statistics', description: 'Track your progress over time with simple charts.' },
+  ]}
+/>
+
+import IconLink from '../../components/IconLink.astro';
+
+<IconLink href="https://github.com/46daishi/nodoka/releases" icon={'\ue709'}>Download it here</IconLink>

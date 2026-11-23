@@ -16,6 +16,9 @@ links:
 ---
 
 import ScreenshotGallery from '../../components/projects/ScreenshotGallery.astro';
+import RoadMap from '../../components/RoadMap.astro';
+import tomoyoLogo from '../../assets/icons/tomoyo.png';
+import HanaDivider from '../../components/HanaDivider.astro';
 
 
 tomoyo is an immersion app made in Tauri + SvelteKit. Its goal is to aid you in learning Japanese by mainly just reading native content instead of relying on spaced repetition.
@@ -24,7 +27,7 @@ tomoyo is an immersion app made in Tauri + SvelteKit. Its goal is to aid you in 
 
 <ScreenshotGallery project="tomoyo" />
 
-## ✨️ Features
+## ✨ Features
 import ProjectFeatures from '../../components/ProjectFeatures.astro';
 
 <ProjectFeatures
@@ -47,6 +50,19 @@ import IconLink from '../../components/IconLink.astro';
 
 <IconLink href="https://github.com/46daishi/tomoyo/releases" icon={'\ue709'}>Download it here</IconLink>
 
+## 🎯 Roadmap
+
+<RoadMap
+  logo={tomoyoLogo}
+  versions={[
+    { version: 'v1.1.0', date: 'September 2026', features: ['First public release'] },
+    { version: 'v1.2.0', date: 'October 2026', features: ['Word frequency labels', 'Pick reading when mining', 'Readings in furigana'] },
+    { version: 'v1.3.0', date: 'October 2026', features: ['Light mode', 'Custom word-level colours'] },
+    { version: 'v1.4.0', date: 'October 2026', current: true, features: ['Media categories', 'Jiten stats integration', 'Styling revamp'] },
+    { version: 'v1.5.0', date: 'November 2026', features: ['Kanji integration', 'Export stats to .png', 'Lookup tab in dictionary'] },
+    { version: 'v1.6.0', date: 'December 2026', features: ['Read e-books in the app', 'Manage LN volumes', 'Custom tags'] },
+  ]}
+/>
 
 ## 📘 Philosophy
 
