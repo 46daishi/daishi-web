@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 import pfp from '../assets/pfp.jpg';
+import DefaultShareImage from '../assets/og-default.png';
 import cursorSprite from '../assets/icons/cursor0.bmp?url';
 import BaseHead from '../components/BaseHead.astro';
 import BlogPostPreview from '../components/BlogPostPreview.astro';
@@ -182,7 +183,7 @@ const featuredProjects = projects
 
 			<FeaturedProjects projects={featuredProjects} />
 
-			{featuredPosts.length > 0 && (
+			{(featuredPosts.length > 0 || posts.length === 0) && (
 				<section class="featured-posts" aria-labelledby="featured-posts-heading">
 					<div class="section-heading">
 						<div>
@@ -218,6 +219,22 @@ const featuredProjects = projects
 								</a>
 							</li>
 						))}
+						{Array.from({ length: Math.max(0, 3 - featuredPosts.length) }, () => (
+									<li>
+										<div class="featured-post-tile featured-post-placeholder">
+											<Image
+												class="featured-post-tile-image"
+												src={DefaultShareImage}
+												alt=""
+												width={640}
+												height={256}
+											/>
+											<span class="featured-post-tile-body">
+												<span class="featured-post-tile-title">Coming soon</span>
+											</span>
+										</div>
+									</li>
+						))}
 					</ul>
 				</section>
 			)}
@@ -232,54 +249,58 @@ const featuredProjects = projects
 						<SectionLink href="/blog/">all posts</SectionLink>
 					</div>
 					<ul>
-						{latestPosts.map((post) => {
-							const project = projects.find((project) => project.id === post.data.project);
+						{latestPosts.length > 0 ? (
+							latestPosts.map((post) => {
+								const project = projects.find((project) => project.id === post.data.project);
 
-							return (
-								<li>
-									<article class="latest-post">
-										<a
-											class="latest-post-image-link"
-											href={`/blog/${post.id}/`}
-											tabindex="-1"
-											aria-hidden="true"
-										>
-											{post.data.heroImage ? (
-												<Image src={post.data.heroImage} alt="" width={320} height={180} />
-											) : (
-												<span class="latest-post-preview" aria-hidden="true">
-													<BlogPostPreview
-														postId={post.id}
-														title={post.data.title}
-														homepagePreview="recent"
-													/>
-												</span>
-											)}
-										</a>
-										<div class="latest-post-body">
-											<a class="latest-post-title" href={`/blog/${post.id}/`}>
-												{post.data.title}
-											</a>
-											<div class="post-meta">
-												<FormattedDate date={post.data.pubDate} format="ja" />
-												{post.data.tags.map((tag) => (
-													<span class="post-tag">#{tag.trim().replace(/\s+/g, '-')}</span>
-												))}
-												{project && (
-													<a
-														class="post-project"
-														href={`/projects/${post.data.project}/`}
-														style={`--project-color: ${project.data.color};`}
-													>
-														#{post.data.project}
-													</a>
+								return (
+									<li>
+										<article class="latest-post">
+											<a
+												class="latest-post-image-link"
+												href={`/blog/${post.id}/`}
+												tabindex="-1"
+												aria-hidden="true"
+											>
+												{post.data.heroImage ? (
+													<Image src={post.data.heroImage} alt="" width={320} height={180} />
+												) : (
+													<span class="latest-post-preview" aria-hidden="true">
+														<BlogPostPreview
+															postId={post.id}
+															title={post.data.title}
+															homepagePreview="recent"
+														/>
+													</span>
 												)}
+											</a>
+											<div class="latest-post-body">
+												<a class="latest-post-title" href={`/blog/${post.id}/`}>
+													{post.data.title}
+												</a>
+												<div class="post-meta">
+													<FormattedDate date={post.data.pubDate} format="ja" />
+													{post.data.tags.map((tag) => (
+														<span class="post-tag">#{tag.trim().replace(/\s+/g, '-')}</span>
+													))}
+													{project && (
+														<a
+															class="post-project"
+															href={`/projects/${post.data.project}/`}
+															style={`--project-color: ${project.data.color};`}
+														>
+															#{post.data.project}
+														</a>
+													)}
+												</div>
 											</div>
-										</div>
-									</article>
-								</li>
-							);
-						})}
+										</article>
+									</li>
+								);
+							})
+						) : (
+							<li class="latest-posts-empty">No blog posts yet.</li>
+						)}
 					</ul>
 				</section>
 
@@ -801,13 +822,13 @@ const featuredProjects = projects
 		line-height: 1.25;
 	}
 
-	.featured-post-tile:hover,
-	.featured-post-tile:focus-visible {
+	a.featured-post-tile:hover,
+	a.featured-post-tile:focus-visible {
 		border-color: hsl(var(--primary) / 0.5);
 	}
 
-	.featured-post-tile:hover .featured-post-tile-title,
-	.featured-post-tile:focus-visible .featured-post-tile-title {
+	a.featured-post-tile:hover .featured-post-tile-title,
+	a.featured-post-tile:focus-visible .featured-post-tile-title {
 		color: hsl(var(--primary));
 	}
 
@@ -842,7 +863,7 @@ const featuredProjects = projects
 
 	.site-log {
 		contain: size;
-		min-height: 0;
+		min-height: 16rem;
 		--log-bg: hsl(var(--card));
 		--log-fg: hsl(var(--foreground));
 		--log-muted: hsl(var(--muted-foreground));
@@ -862,6 +883,10 @@ const featuredProjects = projects
 		margin: 0;
 		padding: 0;
 		list-style: none;
+	}
+
+	.latest-posts ul {
+		flex: 0 0 auto;
 	}
 
 	.log-list {
@@ -888,8 +913,14 @@ const featuredProjects = projects
 
 	.latest-posts li {
 		display: flex;
-		flex: 1;
+		flex: 0 0 auto;
 		border-top: 1px solid hsl(var(--border));
+	}
+
+	.latest-posts .latest-posts-empty {
+		padding: 0.75rem 0;
+		color: hsl(var(--muted-foreground));
+		font-size: 0.85rem;
 	}
 
 	.log-list li {

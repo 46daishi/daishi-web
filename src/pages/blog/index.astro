@@ -139,7 +139,9 @@ const projectFilters = (await getCollection('projects'))
 					</li>
 				))}
 			</ul>
-			<p class="empty-state" data-empty-state hidden>No posts match these filters.</p>
+			<p class="empty-state" data-empty-state hidden={posts.length > 0}>
+				{posts.length === 0 ? 'No blog posts yet.' : 'No posts match these filters.'}
+			</p>
 		</main>
 		<Footer />
 	</body>
@@ -153,6 +155,7 @@ const projectFilters = (await getCollection('projects'))
 	const posts = [...document.querySelectorAll('[data-post-tags]')];
 	const count = document.querySelector('[data-filter-count]');
 	const emptyState = document.querySelector('[data-empty-state]');
+	const emptyMessage = posts.length === 0 ? 'No blog posts yet.' : 'No posts match these filters.';
 	const tagsByPost = new Map(posts.map((post) => [post, JSON.parse(post.dataset.postTags)]));
 	let selectedTag = 'all';
 	let selectedProject = 'all';
@@ -180,6 +183,7 @@ const projectFilters = (await getCollection('projects'))
 
 		count.textContent = `${visibleCount} ${visibleCount === 1 ? 'post' : 'posts'}`;
 		emptyState.hidden = visibleCount > 0;
+		emptyState.textContent = emptyMessage;
 	};
 
 	tagButtons.forEach((button) => {

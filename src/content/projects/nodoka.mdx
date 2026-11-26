@@ -2,7 +2,8 @@
 title: nodoka
 description: Minimalist pomodoro timer and time tracker with profiles and detailed statistics.
 icon: '../../assets/icons/nodoka.png'
-banner: '../../assets/projects/nodoka-banner.png'
+banner: '../../assets/projects/nodoka-banner.webp'
+bannerY: 20
 color: '#24aaf2'
 type: software
 status: active
@@ -14,18 +15,19 @@ links:
 ---
 
 import ScreenshotGallery from '../../components/projects/ScreenshotGallery.astro';
+import IconLink from '../../components/IconLink.astro';
+import ProjectFeatures from '../../components/ProjectFeatures.astro';
+import RoadMap from '../../components/RoadMap.astro';
+import nodokaLogo from '../../assets/icons/nodoka.png';
 
 nodoka is a simple pomodoro/time tracker app with profiles and statistics.
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Android%20%7C%20Windows-blue?style=flat-square)
 
 <img src="https://i.imgur.com/STETVJG.png"></img>
 
-
 <ScreenshotGallery project="nodoka" />
 
-## ✨ Features
-
-import ProjectFeatures from '../../components/ProjectFeatures.astro';
+## Features
 
 <ProjectFeatures
   features={[
@@ -38,6 +40,15 @@ import ProjectFeatures from '../../components/ProjectFeatures.astro';
   ]}
 />
 
-import IconLink from '../../components/IconLink.astro';
-
 <IconLink href="https://github.com/46daishi/nodoka/releases" icon={'\ue709'}>Download it here</IconLink>
+
+## Roadmap
+
+<RoadMap
+  logo={nodokaLogo}
+  versions={[
+    { version: 'v1.0.0', date: 'June 2026', current: true, features: ['First release'] },
+    { version: 'v1.1.0', date: 'Q1 2027', features: ['Stats for year/month', 'Manually add sessions', 'Extend flow mode breaks'] },
+    { version: 'v1.2.0', date: 'Q1 2027', features: ['Day planning functionality', 'Todo list', 'Custom themes'] },
+  ]}
+/>

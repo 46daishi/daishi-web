@@ -9,14 +9,19 @@ type Props = {
 };
 
 const { project } = Astro.props;
-const { title, description, icon, status, version, links, color, type, featured } = project.data;
+const { title, description, icon, banner, bannerY, status, version, links, color, type, featured } = project.data;
 const projectHref = `/projects/${project.id}/`;
 const typeIcon =
 	type === 'software' ? '\uf121' : type === 'light-novel' ? '\u{f05da}' : '\u{f02d5}';
 const isExternal = (href: string) => /^https?:\/\//.test(href);
 ---
 
-<article class:list={['project', { 'is-featured': featured }]} style={`--project-color: ${color};`}>
+<article
+	class:list={['project', { 'is-featured': featured }]}
+	style={`--project-color: ${color}; --project-banner-y: ${bannerY}%;`}
+>
+	<Image class="project-banner" src={banner} alt="" width={720} loading="lazy" />
+	<span class="project-banner-fade" aria-hidden="true"></span>
 	{featured && (
 		<span class="featured-star" role="img" aria-label="Featured project">
 			<svg viewBox="0 0 24 24" aria-hidden="true">
@@ -71,13 +76,53 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 	.project {
 		--project-ink: color-mix(in srgb, var(--project-color) 60%, hsl(var(--foreground)));
 		position: relative;
+		isolation: isolate;
 		display: flex;
 		flex-direction: column;
 		height: 100%;
+		overflow: hidden;
 		padding: 1rem;
 		border: 1px solid hsl(var(--border));
 		border-radius: 0.75rem;
 		transition: border-color 0.18s ease;
+	}
+
+	.project-banner {
+		position: absolute;
+		z-index: -2;
+		inset: auto 0 0;
+		width: 100%;
+		height: 5rem;
+		margin: 0;
+		border: 0;
+		object-fit: cover;
+		object-position: center var(--project-banner-y, 50%);
+		opacity: 0;
+		pointer-events: none;
+		-webkit-mask-image: linear-gradient(to bottom, transparent, #000 38%);
+		mask-image: linear-gradient(to bottom, transparent, #000 38%);
+		transition: opacity 0.2s ease;
+	}
+
+	.project-banner-fade {
+		position: absolute;
+		z-index: -1;
+		inset: auto 0 0;
+		height: 5rem;
+		background: linear-gradient(to bottom, transparent, hsl(var(--background)));
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s ease;
+	}
+
+	.project:hover .project-banner,
+	.project:focus-within .project-banner {
+		opacity: 0.28;
+	}
+
+	.project:hover .project-banner-fade,
+	.project:focus-within .project-banner-fade {
+		opacity: 0.75;
 	}
 
 	.featured-star {
@@ -147,6 +192,14 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 
 	.project-title {
 		color: hsl(var(--foreground));
+		text-decoration: none;
+	}
+
+	.project-title::after {
+		position: absolute;
+		z-index: 0;
+		inset: 0;
+		content: '';
 		text-decoration: none;
 	}
 
@@ -228,6 +281,8 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 	}
 
 	.project-actions a {
+		position: relative;
+		z-index: 1;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
@@ -265,7 +320,9 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
 		.project-title h3,
 		.project-actions a,
 		.project-action-label,
-		.project-icon {
+		.project-icon,
+		.project-banner,
+		.project-banner-fade {
 			transition: none;
 		}
 	}

@@ -2,7 +2,7 @@
 // You can import this data from anywhere in your site by using the `import` keyword.
 
 export const SITE_TITLE = 'daishi.moe';
-export const SITE_DESCRIPTION = 'Welcome to my website!';
+export const SITE_DESCRIPTION = 'Writer and developer with a passion for visual novels, mahjong, and tech.';
 
 export const PROJECT_TYPES = ['visual-novel', 'light-novel', 'software'] as const;
 export type ProjectType = (typeof PROJECT_TYPES)[number];

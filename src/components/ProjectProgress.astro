@@ -10,6 +10,7 @@ interface Props {
 	status?: string;
 	href?: string;
 	banner?: ImageMetadata;
+	bannerY?: number;
 	thumbnail?: ImageMetadata;
 }
 
@@ -21,15 +22,26 @@ const {
 	status,
 	href,
 	banner,
+	bannerY,
 	thumbnail,
 } = Astro.props;
 const progressValue = Math.min(100, Math.max(0, progress));
+const bannerPositionY = Math.min(100, Math.max(0, bannerY ?? 30));
 const isExternal = href ? /^https?:\/\//.test(href) : false;
 ---
 
 <section class="project-progress" aria-label={`${title} progress`}>
 	<header class:list={['progress-header', { 'has-banner': banner }]}>
-		{banner && <Image class="progress-banner" src={banner} alt="" />}
+		{banner && (
+			<span class="progress-banner-frame" aria-hidden="true">
+				<Image
+					class="progress-banner"
+					src={banner}
+					alt=""
+					style={`--banner-offset-y: ${(50 - bannerPositionY) * 0.4}%;`}
+				/>
+			</span>
+		)}
 		<div class="progress-header-content">
 			<h2>
 				{href ? (
@@ -102,19 +114,25 @@ const isExternal = href ? /^https?:\/\//.test(href) : false;
 		background: color-mix(in srgb, var(--progress-accent) 20%, #25262b);
 	}
 
-	.progress-banner {
+	.progress-banner-frame {
 		position: absolute;
 		z-index: -2;
 		inset: 0 0 0 auto;
 		width: 48%;
+		overflow: hidden;
+		-webkit-mask-image: linear-gradient(90deg, transparent, #000 28%, #000 78%, transparent);
+		mask-image: linear-gradient(90deg, transparent, #000 28%, #000 78%, transparent);
+	}
+
+	.progress-banner {
+		width: 100%;
 		height: 100%;
 		margin: 0;
 		border: 0;
 		border-radius: 0;
 		object-fit: cover;
-		object-position: center 30%;
-		-webkit-mask-image: linear-gradient(90deg, transparent, #000 28%, #000 78%, transparent);
-		mask-image: linear-gradient(90deg, transparent, #000 28%, #000 78%, transparent);
+		transform: translateY(var(--banner-offset-y, 8%)) scale(1.4);
+		transform-origin: center;
 	}
 
 	.progress-header.has-banner::after {

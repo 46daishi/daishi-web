@@ -2,12 +2,14 @@
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-interface RoadMapVersion {
+type RoadMapVersion = {
 	version: string;
 	date: string;
-	features: string[];
 	current?: boolean;
-}
+} & (
+	| { features: string[]; description?: never }
+	| { description: string; features?: never }
+);
 
 interface Props {
 	versions: RoadMapVersion[];
@@ -24,7 +26,7 @@ const { versions, logo } = Astro.props;
 		</button>
 		<div class="roadmap-scroll" tabindex="0" aria-label="Scrollable project versions">
 			<ol class="roadmap-track">
-				{versions.map(({ version, date, features, current }) => {
+				{versions.map(({ version, date, features, description, current }) => {
 					const isCurrent = current === true;
 
 					return (
@@ -53,11 +55,15 @@ const { versions, logo } = Astro.props;
 								)}
 							</div>
 
-							<ul class="roadmap-features">
-								{features.map((feature) => (
-									<li>{feature}</li>
-								))}
-							</ul>
+							{description ? (
+								<p class="roadmap-description">{description}</p>
+							) : (
+								<ul class="roadmap-features">
+									{features?.map((feature) => (
+										<li>{feature}</li>
+									))}
+								</ul>
+							)}
 						</li>
 					);
 				})}
@@ -327,6 +333,13 @@ const { versions, logo } = Astro.props;
 		font-size: 0.78rem;
 		line-height: 1.4;
 		list-style: disc;
+	}
+
+	.roadmap-description {
+		margin: 0;
+		padding: 0 0.5rem;
+		font-size: 0.82rem;
+		line-height: 1.5;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

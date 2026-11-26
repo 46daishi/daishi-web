@@ -2,7 +2,8 @@
 title: tomoyo
 description: Japanese immersion app with pop-up lookups, known-word highlighting, and built-in reviewing.
 icon: '../../assets/icons/tomoyo.png'
-banner: '../../assets/projects/tomoyo-banner.png'
+banner: '../../assets/projects/tomoyo-banner.jpg'
+bannerY: 40
 color: '#466db5'
 type: software
 status: active
@@ -19,6 +20,8 @@ import ScreenshotGallery from '../../components/projects/ScreenshotGallery.astro
 import RoadMap from '../../components/RoadMap.astro';
 import tomoyoLogo from '../../assets/icons/tomoyo.png';
 import HanaDivider from '../../components/HanaDivider.astro';
+import IconLink from '../../components/IconLink.astro';
+import ProjectFeatures from '../../components/ProjectFeatures.astro';
 
 
 tomoyo is an immersion app made in Tauri + SvelteKit. Its goal is to aid you in learning Japanese by mainly just reading native content instead of relying on spaced repetition.
@@ -27,8 +30,7 @@ tomoyo is an immersion app made in Tauri + SvelteKit. Its goal is to aid you in 
 
 <ScreenshotGallery project="tomoyo" />
 
-## ✨ Features
-import ProjectFeatures from '../../components/ProjectFeatures.astro';
+## Features
 
 <ProjectFeatures
   features={[
@@ -46,11 +48,9 @@ import ProjectFeatures from '../../components/ProjectFeatures.astro';
 
 **And more features such as:** custom name dictionary, attaching images to words, history, and word frequency labels.
 
-import IconLink from '../../components/IconLink.astro';
-
 <IconLink href="https://github.com/46daishi/tomoyo/releases" icon={'\ue709'}>Download it here</IconLink>
 
-## 🎯 Roadmap
+## Roadmap
 
 <RoadMap
   logo={tomoyoLogo}
@@ -64,13 +64,13 @@ import IconLink from '../../components/IconLink.astro';
   ]}
 />
 
-## 📘 Philosophy
+## Philosophy
 
 The reason this app came into being is rather simple; while Anki can be helpful in the beginning, it eventually becomes a chore that takes a significant portion of your time. Another issue with it and SRS in general is that it doesn't take into account how frequently you'll encounter particular words and makes you learn them largely without context.
 
 I wanted a tool that allows me to focus more on reading native content rather than grinding flashcards, and tomoyo does exactly that. Instead of spaced repetition, this app bases its learning method on continuously encountering words naturally in context and gradually coming to comprehend them better with repeated exposure. Every mined word has a level assigned to it which you can change on the fly, making each reading session a review in itself. With the option to highlight word levels, as you read more the text will gradually turn more green and show your progress visually.
 
-## 📋️ How to use
+## How to use
 
 Technically all you need is your clipboard, but for something like a game or VN you'll also need something that will extract text from it - either a texthooker or OCR.
 
@@ -78,7 +78,7 @@ Start by creating a media entry: book, article, game, VN, and so on. Once that's
 
 As you mine words they'll start being underlined with their level; click on the underline to change the level on the go.
 
-## ❓️ FAQ
+## FAQ
 > **Q: Can I use this as a beginner?**  
 A: I wouldn't recommend it for a complete beginner; you need a base of both grammar and vocabulary before you start reading native content.
 
@@ -103,7 +103,7 @@ A: Use the cycle function (Shift hotkey by default).
 > **Q: Where do I report bugs?**  
 A: Either create a GH issue or post about it in the **#tomoyo** channel on my [Discord](discord.gg/fHJJm4jpwV)
 
-## ⭐️ Credits/Inspirations
+## Credits/Inspirations
 - [JL](https://github.com/rampaa/JL): direct inspiration for the lookup mechanism
 - [LingQ](https://www.lingq.com/en/): inspiration for learning philosophy and the word level system
 - [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project): dictionary used in the look-ups

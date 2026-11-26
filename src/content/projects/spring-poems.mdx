@@ -23,17 +23,16 @@ links:
 ---
 
 import ScreenshotGallery from '../../components/projects/ScreenshotGallery.astro';
-
-Spring Poems is a drama/mystery visual novel with supernatural elements made with **ONScripter-EN**. It's the first entry in the **Hoshi no Keikyo** (星の携挙) series.
-
+import spLogo from '../../assets/icons/spring-poems.png';
 import IconLink from '../../components/IconLink.astro';
-
-<IconLink href="https://46dai.itch.io/spring-poems-demo" icon={'\uef99'}>Read the demo</IconLink>
-
-
 import progressArt from '../../assets/widgets/sayaka.jpg';
 import thumbnail from '../../assets/widgets/shimakura.png';
 import ProjectProgress from '../../components/ProjectProgress.astro';
+import RoadMap from '../../components/RoadMap.astro';
+
+Spring Poems is a drama/mystery visual novel with supernatural elements made with **ONScripter-EN**. It's the first entry in the **Hoshi no Keikyo** (星の携挙) series.
+
+<IconLink href="https://46dai.itch.io/spring-poems-demo" icon={'\uef99'}>Read the demo</IconLink>
 
 <ProjectProgress
   title="Progress"
@@ -51,3 +50,15 @@ The story follows Satoshi, a talented artist who has seemingly lost his way, no 
 Everything changes with a series of incidents at the school. Mysterious deaths. Disappearances. Phantoms and curses. All seemingly beyond him. But when he encounters a cryptic poet — a harbinger of spring and of death — he realises that he cannot continue running from the shadows of the past.
 
 <ScreenshotGallery project="spring-poems" />
+
+## Chapter progress
+
+<RoadMap
+  logo={spLogo}
+  versions={[
+    { version: 'Chapter 1', date: 'January 2026', description: 'Sound novel demo available.' },
+    { version: 'Chapter 2', date: 'October 2026', description: 'Beta-reading the script in progress.' },
+    { version: 'Chapter 3', date: 'October 2026', current: true, description: 'Beta-reading the script in progress.' },
+    { version: 'Chapter 4', date: 'Q1 2027', description: 'Planning the chapter.' },
+  ]}
+/>
