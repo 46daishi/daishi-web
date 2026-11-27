@@ -25,6 +25,14 @@ import Header from '../components/Header.astro';
 import ProfileFacts from '../components/ProfileFacts.astro';
 import { SITE_TITLE } from '../consts';
 
+const currentlyInto = [
+	{ title: 'Final Fantasy VII Remake', icon: 'https://cdn2.steamgriddb.com/icon_thumb/d6cf4da5ced8580c991e16fb54faa1b6.png' },
+	{ title: 'Baldur\'s Gate 3', icon: 'https://cdn2.steamgriddb.com/icon/0cd60efb5578cd967c3c23894f305800/32/256x256.png' },
+	{ title: 'Yosuga no Sora', icon: 'https://cdn2.steamgriddb.com/icon/f1ce00c04b55f6c2d825498cc86a296e/8/32x32.png' },
+	{ title: 'The House in Fata Morgana', icon: 'https://i.pinimg.com/736x/3e/4d/7f/3e4d7f9c31407cc18806d635592bbc6a.jpg' },
+	{ title: 'I/O revision II', icon: 'https://t.vndb.org/cv/72/154272.jpg' },
+];
+
 const favoriteMedia = [
 	{ title: 'ef - a fairy tale of the two', type: 'Visual Novel', cover: mediaPlaceholder1 },
 	{ title: 'STEINS;GATE', type: 'Visual Novel', cover: mediaPlaceholder2 },
@@ -229,6 +237,33 @@ const bioParagraphs: BioToken[][] = [
 							<p>I like tinkering with Linux and have been daily driving it for more than a year.</p>
 						</div>
 					</li>
+				</ul>
+			</section>
+
+			<section class="currently" aria-labelledby="currently-heading">
+				<header class="section-heading">
+					<div>
+						<span class="section-kicker" lang="ja">現在</span>
+						<h2 id="currently-heading">currently reading &amp; playing</h2>
+					</div>
+				</header>
+
+				<ul class="currently-row">
+					{currentlyInto.map((item) => (
+						<li>
+							<span class="currently-icon">
+								<img
+									src={item.icon}
+									alt=""
+									width="64"
+									height="64"
+									loading="lazy"
+									decoding="async"
+								/>
+							</span>
+							<span class="currently-name">{item.title}</span>
+						</li>
+					))}
 				</ul>
 			</section>
 
@@ -575,6 +610,64 @@ const bioParagraphs: BioToken[][] = [
 		line-height: 1.65;
 	}
 
+	.currently {
+		margin-top: 2.5rem;
+	}
+
+	.currently-row {
+		display: grid;
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+		gap: 1.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.currently-row li {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		min-width: 0;
+		gap: 0.55rem;
+		text-align: center;
+	}
+
+	.currently-icon {
+		display: grid;
+		place-items: center;
+		width: 40px;
+		height: 40px;
+	}
+
+	.currently-icon img {
+		width: 30px;
+		height: 30px;
+		border: 0;
+		object-fit: contain;
+	}
+
+	.currently-name {
+		color: hsl(var(--foreground) / 0.85);
+		font-family: var(--font-sazanami);
+		font-size: 0.82rem;
+		line-height: 1.35;
+		text-wrap: balance;
+	}
+
+	@media (hover: hover) {
+		.currently-row li {
+			transition: transform 0.18s ease;
+		}
+
+		.currently-row li:hover {
+			transform: translateY(-2px);
+		}
+
+		.currently-row li:hover .currently-name {
+			color: hsl(var(--primary));
+		}
+	}
+
 	.favorite-media {
 		margin-top: 2.5rem;
 	}
@@ -707,6 +800,21 @@ const bioParagraphs: BioToken[][] = [
 		}
 	}
 
+	@media (max-width: 560px) {
+		.currently-row {
+			gap: 0.5rem;
+		}
+
+		.currently-icon img {
+			width: 26px;
+			height: 26px;
+		}
+
+		.currently-name {
+			font-size: 0.72rem;
+		}
+	}
+
 	@media (max-width: 420px) {
 		.favorite-media-grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -717,13 +825,15 @@ const bioParagraphs: BioToken[][] = [
 		.about-portrait figcaption,
 		.interest-grid li,
 		.media-card,
-		.media-cover {
+		.media-cover,
+		.currently-row li {
 			transition: none;
 		}
 
 		.interest-grid li:hover,
 		.interest-grid li:focus-within,
-		.media-card:hover {
+		.media-card:hover,
+		.currently-row li:hover {
 			transform: none;
 		}
 
